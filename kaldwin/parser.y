@@ -88,7 +88,7 @@ lexprs
     ;
 
 lexpr
-    : lexpr '[' INT ']'                         { kaldwin_yy_construct_lexpr_index($3); }
+    : lexpr '[' INT ']'                         { kaldwin_yy_construct_lexpr_slice($3, $3); }
     | lexpr '[' INT ':' INT ']'                 { kaldwin_yy_construct_lexpr_slice($3, $5); }
     | lexpr_nosuffix
     ;
@@ -119,7 +119,7 @@ rexpr
     ;
 
 rexpr_noprefix
-    : rexpr '[' INT ']'                         { kaldwin_yy_construct_rexpr_index($3); }
+    : rexpr '[' INT ']'                         { kaldwin_yy_construct_rexpr_slice($3, $3); }
     | rexpr '[' INT ':' INT ']'                 { kaldwin_yy_construct_rexpr_slice($3, $5); }
     | rexpr_nosuffix
     ;

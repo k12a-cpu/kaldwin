@@ -9,7 +9,6 @@ type
   LExprKind* = enum
     lexprNodeRef
     lexprConcat
-    lexprIndex
     lexprSlice
   
   LExpr*[N] = object
@@ -18,9 +17,6 @@ type
       node*: N
     of lexprConcat:
       concatChildren*: seq[ref LExpr[N]]
-    of lexprIndex:
-      index*: uint
-      indexChild*: ref LExpr[N]
     of lexprSlice:
       sliceUpperBound*: uint
       sliceLowerBound*: uint
@@ -35,7 +31,6 @@ type
     rexprBinaryOp
     rexprConcat
     rexprMultiply
-    rexprIndex
     rexprSlice
   
   RExpr*[N] = object
@@ -56,9 +51,6 @@ type
     of rexprMultiply:
       multiplyCount*: uint
       multiplyChild*: ref RExpr[N]
-    of rexprIndex:
-      index*: uint
-      indexChild*: ref RExpr[N]
     of rexprSlice:
       sliceUpperBound*: uint
       sliceLowerBound*: uint

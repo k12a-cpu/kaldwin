@@ -68,14 +68,6 @@ proc addInput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_inp
 proc addOutput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_output".} =
   unit.outputWidths[$name] = uint(bits)
 
-proc constructLExprIndex(index: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_index".} =
-  let child = lexprStack.pop()
-  lexprStack.add(LExprRef[string](
-    kind: lexprIndex,
-    index: uint(index),
-    indexChild: child,
-  ))
-
 proc constructLExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_slice".} =
   let child = lexprStack.pop()
   lexprStack.add(LExprRef[string](
@@ -103,14 +95,6 @@ proc constructRExprNot() {.cdecl, exportc: "kaldwin_yy_construct_rexpr_not".} =
   rexprStack.add(RExprRef[string](
     kind: rexprNot,
     notChild: child,
-  ))
-
-proc constructRExprIndex(index: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_index".} =
-  let child = rexprStack.pop()
-  rexprStack.add(RExprRef[string](
-    kind: rexprIndex,
-    index: uint(index),
-    indexChild: child,
   ))
 
 proc constructRExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_slice".} =

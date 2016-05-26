@@ -1394,7 +1394,7 @@ yyreduce:
 
   case 24:
 #line 91 "kaldwin/parser.y" /* yacc.c:1646  */
-    { kaldwin_yy_construct_lexpr_index((yyvsp[-1].u64)); }
+    { kaldwin_yy_construct_lexpr_slice((yyvsp[-1].u64), (yyvsp[-1].u64)); }
 #line 1399 "kaldwin/parser_gen.c" /* yacc.c:1646  */
     break;
 
@@ -1448,7 +1448,7 @@ yyreduce:
 
   case 37:
 #line 122 "kaldwin/parser.y" /* yacc.c:1646  */
-    { kaldwin_yy_construct_rexpr_index((yyvsp[-1].u64)); }
+    { kaldwin_yy_construct_rexpr_slice((yyvsp[-1].u64), (yyvsp[-1].u64)); }
 #line 1453 "kaldwin/parser_gen.c" /* yacc.c:1646  */
     break;
 
