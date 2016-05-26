@@ -2,7 +2,7 @@ import sets
 import tables
 import kaldwin.types
 
-const generatedLoc: Loc = (filename: "<generated>", lineno: 0)
+const generatedLoc: Loc = (filename: "<generated in flattenBranches>", lineno: 0)
 
 proc getOrDefault[A, B](t: Table[A, B], key: A, defaultValue: B): B =
   if key in t:
@@ -46,7 +46,7 @@ proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context:
         context[outputNode] = thenExpr
       else:
         context[outputNode] = RExprRef[RN](
-          loc: s.loc,
+          loc: generatedLoc,
           kind: rexprMux,
           muxCondition: s.ifCondition,
           muxThen: thenExpr,
