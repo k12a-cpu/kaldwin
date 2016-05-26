@@ -69,6 +69,16 @@ proc rope*[RN](e: RExprRef[RN]): Rope =
       rope(e.rightChild),
       rope(")"),
     ]
+  of rexprMux:
+    result = &[
+      rope("("),
+      rope(e.muxCondition),
+      rope(" ? "),
+      rope(e.muxThen),
+      rope(" : "),
+      rope(e.muxElse),
+      rope(")"),
+    ]
   of rexprConcat:
     result = rope("{")
     if e.concatChildren.len() > 0:

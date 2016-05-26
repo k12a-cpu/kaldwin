@@ -35,6 +35,7 @@ type
     rexprLiteral
     rexprNot
     rexprBinaryOp
+    rexprMux
     rexprConcat
     rexprMultiply
     rexprSlice
@@ -53,6 +54,10 @@ type
       op*: BinaryOp
       leftChild*: ref RExpr[N]
       rightChild*: ref RExpr[N]
+    of rexprMux:
+      muxCondition*: ref RExpr[N]
+      muxThen*: ref RExpr[N]
+      muxElse*: ref RExpr[N]
     of rexprConcat:
       concatChildren*: seq[ref RExpr[N]]
     of rexprMultiply:

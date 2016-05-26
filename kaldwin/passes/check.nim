@@ -42,6 +42,16 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
       c.error(e.loc, "left and right operands have different widths ($1 and $2)" % [$leftWidth, $rightWidth])
     result = leftWidth
   
+  of rexprMux:
+    let condWidth = c.walk(e.muxCondition)
+    if condWidth != 1:
+      c.error(e.muxCondition.loc, "mux condition does not have a bit width of 1")
+    let thenWidth = c.walk(e.muxThen)
+    let elseWidth = c.walk(e.muxElse)
+    if thenWidth != elseWidth:
+      c.error(e.muxThen.loc, "mux branches have different widths ($1 and $2)" % [$thenWidth, $elseWidth])
+    result = thenWidth
+
   of rexprConcat:
     for child in e.concatChildren:
       let childWidth = c.walk(child)
