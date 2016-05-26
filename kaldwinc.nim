@@ -2,6 +2,8 @@ import kaldwin.parse
 import kaldwin.stringify
 import kaldwin.passes.check
 import kaldwin.passes.flattenbranches
+import kaldwin.passes.optimiselogic
+import kaldwin.passes.nandify
 
 let unit = parseStdin()
 
@@ -17,6 +19,24 @@ echo()
 echo()
 
 flattenBranches(unit)
+echo $unit
+echo()
+echo()
+echo()
+
+optimiseLogic(unit)
+echo $unit
+echo()
+echo()
+echo()
+
+nandify(unit)
+echo $unit
+echo()
+echo()
+echo()
+
+optimiseLogic(unit)
 echo $unit
 echo()
 echo()
