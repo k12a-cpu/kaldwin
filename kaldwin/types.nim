@@ -33,6 +33,7 @@ type
   RExprKind* = enum
     rexprNodeRef
     rexprLiteral
+    rexprUndefined
     rexprNot
     rexprBinaryOp
     rexprMux
@@ -48,6 +49,8 @@ type
     of rexprLiteral:
       literalWidth*: uint
       literalValue*: uint64
+    of rexprUndefined:
+      undefinedWidth*: uint
     of rexprNot:
       notChild*: ref RExpr[N]
     of rexprBinaryOp:

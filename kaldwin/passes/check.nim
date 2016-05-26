@@ -32,6 +32,9 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
       c.error(e.loc, "literal value is greater than the largest representable $1-bit value ($2)" % [$e.literalWidth, $max])
     result = e.literalWidth
   
+  of rexprUndefined:
+    result = e.undefinedWidth
+
   of rexprNot:
     result = c.walk(e.notChild)
   

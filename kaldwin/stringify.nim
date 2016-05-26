@@ -54,6 +54,11 @@ proc rope*[RN](e: RExprRef[RN]): Rope =
       rope("'d"),
       rope(e.literalValue),
     ]
+  of rexprUndefined:
+    result = &[
+      rope(e.undefinedWidth),
+      rope("'u"),
+    ]
   of rexprNot:
     result = &[
       rope("~"),
