@@ -52,16 +52,16 @@ proc walk[RN](e: var RExprRef[RN]) =
     literalWidth: 1u,
     literalValue: 1u64,
   )
-  
+
   case e.kind
   of rexprNodeRef, rexprLiteral, rexprUndefined:
     discard # no modification needed
-  
+
   of rexprNot:
     walk(e.notChild)
     if e.notChild.kind == rexprNot: # double-not chain
       e = e.notChild.notChild
-  
+
   of rexprBinaryOp:
     walk(e.leftChild)
     walk(e.rightChild)
@@ -96,7 +96,7 @@ proc walk[RN](e: var RExprRef[RN]) =
         e = makeNot(e.rightChild)
       elif e.rightChild.isOne():
         e = makeNot(e.leftChild)
-  
+
   of rexprMux:
     walk(e.muxCondition)
     walk(e.muxThen)
@@ -120,14 +120,14 @@ proc walk[RN](e: var RExprRef[RN]) =
     elif e.muxCondition.kind == rexprNot:
       e.muxCondition = e.muxCondition.notChild
       swap(e.muxThen, e.muxElse)
-  
+
   of rexprConcat:
     for child in e.concatChildren.mitems():
       walk(child)
-  
+
   of rexprMultiply:
     walk(e.multiplyChild)
-  
+
   of rexprSlice:
     walk(e.sliceChild)
 
