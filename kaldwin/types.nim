@@ -1,6 +1,11 @@
+import strutils
 import tables
 
 type
+  Loc* = tuple
+    filename: string
+    lineno: int
+
   BinaryOp* = enum
     binaryOpAnd
     binaryOpOr
@@ -12,6 +17,7 @@ type
     lexprSlice
   
   LExpr*[N] = object
+    loc*: Loc
     case kind*: LExprKind
     of lexprNodeRef:
       node*: N
@@ -34,6 +40,7 @@ type
     rexprSlice
   
   RExpr*[N] = object
+    loc*: Loc
     case kind*: RExprKind
     of rexprNodeRef:
       node*: N
@@ -63,6 +70,7 @@ type
     stmtIf
   
   Stmt*[LN, RN] = object
+    loc*: Loc
     case kind*: StmtKind
     of stmtAssign:
       source*: ref RExpr[RN]
@@ -80,3 +88,6 @@ type
     stmts*: seq[ref Stmt[LN, RN]]
   
   CompilationUnitRef*[LN, RN] = ref CompilationUnit[LN, RN]
+
+proc `$`*(loc: Loc): string =
+  "$1:$2" % [loc.filename, $loc.lineno]
