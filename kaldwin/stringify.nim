@@ -141,7 +141,7 @@ proc rope*[LN, RN](unit: CompilationUnitRef[LN, RN]): Rope =
     result = &[result, rope(";\n")]
   if len(unit.inputWidths) > 0:
     result = result & rope("\n")
-  
+
   for node, width in unit.outputWidths.pairs():
     result = &[result, rope("output "), rope(node)]
     if width != 1:
@@ -149,7 +149,7 @@ proc rope*[LN, RN](unit: CompilationUnitRef[LN, RN]): Rope =
     result = &[result, rope(";\n")]
   if len(unit.outputWidths) > 0:
     result = result & rope("\n")
-  
+
   for s in unit.stmts:
     result = result & rope(s)
 

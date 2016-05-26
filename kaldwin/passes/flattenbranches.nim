@@ -57,7 +57,7 @@ proc flattenBranches*[LN, RN](unit: CompilationUnitRef[LN, RN]) =
   var context = initTable[LN, RExprRef[RN]]()
   for s in unit.stmts:
     walk(s, unit, context)
-  
+
   unit.stmts = @[]
   for node, e in context.pairs():
     unit.stmts.add(StmtRef[LN, RN](

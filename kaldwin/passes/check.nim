@@ -22,7 +22,7 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
       else:
         c.error(e.loc, "undefined reference to input node")
       result = 1 # fallback
-  
+
   of rexprLiteral:
     # 64 will probably work, but don't want to take the risk
     if e.literalWidth > 63u:
@@ -31,20 +31,20 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
     if e.literalValue > max:
       c.error(e.loc, "literal value is greater than the largest representable $1-bit value ($2)" % [$e.literalWidth, $max])
     result = e.literalWidth
-  
+
   of rexprUndefined:
     result = e.undefinedWidth
 
   of rexprNot:
     result = c.walk(e.notChild)
-  
+
   of rexprBinaryOp:
     let leftWidth = c.walk(e.leftChild)
     let rightWidth = c.walk(e.rightChild)
     if leftWidth != rightWidth:
       c.error(e.loc, "left and right operands have different widths ($1 and $2)" % [$leftWidth, $rightWidth])
     result = leftWidth
-  
+
   of rexprMux:
     let condWidth = c.walk(e.muxCondition)
     if condWidth != 1:
@@ -59,11 +59,11 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
     for child in e.concatChildren:
       let childWidth = c.walk(child)
       result += childWidth
-  
+
   of rexprMultiply:
     let childWidth = c.walk(e.multiplyChild)
     result = e.multiplyCount * childWidth
-  
+
   of rexprSlice:
     let childWidth = c.walk(e.sliceChild)
     if e.sliceUpperBound >= childWidth:
@@ -73,7 +73,7 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
     if e.sliceUpperBound < e.sliceLowerBound:
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
     result = e.sliceUpperBound - e.sliceLowerBound + 1u
-  
+
   assert result != 0
 
 # Check the given l-expression, and returns the bit-width of the expression.
@@ -87,12 +87,12 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: LExprRef[LN]): uint =
         c.error(e.loc, "undefined reference to output node '$1'" % [$e.node])
       else:
         c.error(e.loc, "undefined reference to output node")
-  
+
   of lexprConcat:
     for child in e.concatChildren:
       let childWidth = c.walk(child)
       result += childWidth
-  
+
   of lexprSlice:
     let childWidth = c.walk(e.sliceChild)
     if e.sliceUpperBound >= childWidth:
@@ -102,7 +102,7 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: LExprRef[LN]): uint =
     if e.sliceUpperBound < e.sliceLowerBound:
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
     result = e.sliceUpperBound - e.sliceLowerBound + 1u
-  
+
   assert result != 0
 
 proc walk[LN, RN](c: var Checker[LN, RN], s: StmtRef[LN, RN]) =
