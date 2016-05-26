@@ -16,6 +16,8 @@ proc rope*(loc: Loc): Rope =
 
 proc rope*(op: BinaryOp): Rope =
   case op
+  of binaryOpNand:
+    rope("~&")
   of binaryOpAnd:
     rope("&")
   of binaryOpOr:

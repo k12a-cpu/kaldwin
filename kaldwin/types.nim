@@ -7,6 +7,7 @@ type
     lineno: int
 
   BinaryOp* = enum
+    binaryOpNand
     binaryOpAnd
     binaryOpOr
     binaryOpXor
