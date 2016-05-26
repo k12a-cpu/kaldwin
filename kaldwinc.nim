@@ -1,9 +1,11 @@
 import kaldwin.parse
+import kaldwin.stringify
 import kaldwin.passes.check
-import marshal
 
 let unit = parseStdin()
-# echo $$unit
+echo $unit
+echo()
+echo()
 
 let messages = check(unit)
 if messages.len() > 0:
