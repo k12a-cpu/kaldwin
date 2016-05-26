@@ -1,5 +1,5 @@
 from os import parentDir
-import strutils
+from strutils import `%`
 import tables
 import kaldwin.types
 

@@ -1,4 +1,4 @@
-import strutils
+from strutils import `%`
 import tables
 
 type
