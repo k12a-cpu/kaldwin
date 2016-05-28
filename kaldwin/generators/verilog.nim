@@ -83,7 +83,7 @@ proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output
   result = &[result, rope(";\n\n")]
 
   for node, width in unit.intermediateWidths.pairs():
-    result = &[result, "logic "]
+    result = &[result, rope("logic ")]
     if width != 1:
       result = &[result, rope("["), rope(width-1), rope(":0] ")]
     result = &[result, rope(node), rope(";\n")]
