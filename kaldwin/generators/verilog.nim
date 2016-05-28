@@ -48,7 +48,7 @@ proc rope(s: StmtRef[string]): Rope =
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): Rope =
+proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_out"): Rope =
   result = &[rope("module "), rope(moduleName)]
 
   var portLines: seq[Rope] = @[]
@@ -84,5 +84,5 @@ proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output
 
   result = &[result, rope("\nendmodule\n")]
 
-proc generateVerilog*(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): string =
+proc generateVerilog*(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_out"): string =
   $rope(unit, moduleName)
