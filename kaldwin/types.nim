@@ -100,10 +100,10 @@ type
 
   CompilationUnitRef*[N] = ref CompilationUnit[N]
 
-proc `$`*(loc: Loc): string =
+proc `$`*(loc: Loc): string {.noSideEffect.} =
   "$1:$2" % [loc.filename, $loc.lineno]
 
-proc hash*[N](e: LExprRef[N]): Hash =
+proc hash*[N](e: LExprRef[N]): Hash {.noSideEffect.} =
   result = result !& hash(e.kind)
 
   case e.kind
@@ -117,7 +117,7 @@ proc hash*[N](e: LExprRef[N]): Hash =
 
   result = !$result
 
-proc hash*[N](e: RExprRef[N]): Hash =
+proc hash*[N](e: RExprRef[N]): Hash {.noSideEffect.} =
   result = result !& hash(e.kind)
 
   case e.kind
@@ -143,7 +143,7 @@ proc hash*[N](e: RExprRef[N]): Hash =
 
   result = !$result
 
-proc hash*[N](s: StmtRef[N]): Hash =
+proc hash*[N](s: StmtRef[N]): Hash {.noSideEffect.} =
   result = result !& hash(s.kind)
 
   case s.kind
@@ -154,5 +154,5 @@ proc hash*[N](s: StmtRef[N]): Hash =
 
   result = !$result
 
-proc hash*[N](unit: CompilationUnitRef[N]): Hash =
+proc hash*[N](unit: CompilationUnitRef[N]): Hash {.noSideEffect.} =
   result = !$(result !& hash(unit.inputWidths) !& hash(unit.intermediateWidths) !& hash(unit.outputWidths) !& hash(unit.stmts))

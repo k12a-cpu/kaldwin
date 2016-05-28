@@ -12,13 +12,13 @@ type
     exprCache: Table[Hash, RExprRef[N]]
     nextIntermediate: int
 
-proc newIntermediate[N](gvn: var GVN[N], width: int = 1): N =
+proc newIntermediate[N](gvn: var GVN[N], width: int = 1): N {.noSideEffect.} =
   result = "·gvn·" & $gvn.nextIntermediate
   inc gvn.nextIntermediate
 
   gvn.unit.intermediateWidths[result] = width
 
-proc createAssign[N](gvn: var GVN[N], dest: LExprRef[N], source: RExprRef[N]) =
+proc createAssign[N](gvn: var GVN[N], dest: LExprRef[N], source: RExprRef[N]) {.noSideEffect.} =
   gvn.unit.stmts.add(StmtRef[N](
     loc: generatedLoc,
     source: source,

@@ -7,7 +7,7 @@ type
     unit: CompilationUnitRef[N] not nil
     messages: seq[string]
 
-proc error[N](c: var Checker[N], loc: Loc, msg: string) =
+proc error[N](c: var Checker[N], loc: Loc, msg: string) {.noSideEffect.} =
   c.messages.add("$1: $2" % [$loc, msg])
 
 # Check the given r-expression, and returns the bit-width of the expression.

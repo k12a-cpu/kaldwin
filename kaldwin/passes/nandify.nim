@@ -2,14 +2,14 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in nandify>", lineno: 0)
 
-proc makeNot[N](a: RExprRef[N]): RExprRef[N] =
+proc makeNot[N](a: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   RExprRef[N](
     loc: generatedLoc,
     kind: rexprNot,
     notChild: a,
   )
 
-proc makeNand[N](a, b: RExprRef[N]): RExprRef[N] =
+proc makeNand[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,
@@ -18,11 +18,11 @@ proc makeNand[N](a, b: RExprRef[N]): RExprRef[N] =
     rightChild: b,
   )
 
-proc xorToNand[N](a, b: RExprRef[N]): RExprRef[N] =
+proc xorToNand[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   let p = makeNand(a, b)
   result = makeNand(makeNand(a, p), makeNand(b, p))
 
-proc muxToNand[N](cond, then, els: RExprRef[N]): RExprRef[N] =
+proc muxToNand[N](cond, then, els: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   makeNand(makeNand(cond, then), makeNand(makeNot(cond), els))
 
 proc walk[N](e: var RExprRef[N]) =

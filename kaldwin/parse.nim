@@ -27,7 +27,7 @@ proc reset() =
   lexprStack.setLen(0)
   rexprStack.setLen(0)
 
-proc popn[T](a: var seq[T], count: int): seq[T] =
+proc popn[T](a: var seq[T], count: int): seq[T] {.noSideEffect.} =
   let length = a.len()
   result = a[(length - count) .. (length - 1)]
   a.setLen(length - count)

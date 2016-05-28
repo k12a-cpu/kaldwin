@@ -2,16 +2,16 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 
-proc isZero[N](e: RExprRef[N]): bool =
+proc isZero[N](e: RExprRef[N]): bool {.noSideEffect.} =
   e.kind == rexprLiteral and e.literalValue == 0
 
-proc isOne[N](e: RExprRef[N]): bool =
+proc isOne[N](e: RExprRef[N]): bool {.noSideEffect.} =
   e.kind == rexprLiteral and e.literalValue == 1
 
-proc isUndefined[N](e: RExprRef[N]): bool =
+proc isUndefined[N](e: RExprRef[N]): bool {.noSideEffect.} =
   e.kind == rexprUndefined
 
-proc makeNot[N](a: RExprRef[N]): RExprRef[N] =
+proc makeNot[N](a: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   if a.kind == rexprNot:
     a.notChild
   else:
@@ -21,7 +21,7 @@ proc makeNot[N](a: RExprRef[N]): RExprRef[N] =
       notChild: a,
     )
 
-proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] =
+proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,
@@ -30,7 +30,7 @@ proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] =
     rightChild: b,
   )
 
-proc makeOr[N](a, b: RExprRef[N]): RExprRef[N] =
+proc makeOr[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
   RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,

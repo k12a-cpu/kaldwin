@@ -26,7 +26,7 @@ type
     buffers: seq[Buffer]
     nands: seq[Nand]
 
-iterator chunks[T](sequence: seq[T], chunkSize: int): seq[T] =
+iterator chunks[T](sequence: seq[T], chunkSize: int): seq[T] {.noSideEffect.} =
   var start = 0
   var finish = chunkSize - 1
   while finish < sequence.len():
@@ -36,19 +36,19 @@ iterator chunks[T](sequence: seq[T], chunkSize: int): seq[T] =
   if start < sequence.len():
     yield sequence[start .. sequence.len() - 1]
 
-converter toWireOrLiteral(w: Wire): WireOrLiteral =
+converter toWireOrLiteral(w: Wire): WireOrLiteral {.noSideEffect.} =
   WireOrLiteral(isLiteral: false, wire: w)
 
-converter toWireOrLiteral(lit: Literal): WireOrLiteral =
+converter toWireOrLiteral(lit: Literal): WireOrLiteral {.noSideEffect.} =
   WireOrLiteral(isLiteral: true, literal: lit)
 
-proc addBuffer(g: var Generator, q: Wire, a: WireOrLiteral) =
+proc addBuffer(g: var Generator, q: Wire, a: WireOrLiteral) {.noSideEffect.} =
   g.buffers.add((a: a, q: q))
 
-proc addNand(g: var Generator, q: Wire, a, b: WireOrLiteral) =
+proc addNand(g: var Generator, q: Wire, a, b: WireOrLiteral) {.noSideEffect.} =
   g.nands.add((a: a, b: b, q: q))
 
-proc reduce[N](g: var Generator, s: StmtRef[N]) =
+proc reduce[N](g: var Generator, s: StmtRef[N]) {.noSideEffect.} =
   assert(s.kind == stmtAssign, "only stmtAssign should be present at this stage")
   assert(s.dest.kind == lexprNodeRef, "only lexprNodeRef should be present at this stage")
 
@@ -90,7 +90,7 @@ proc reduce[N](g: var Generator, s: StmtRef[N]) =
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 
-proc reduce[N](g: var Generator, unit: CompilationUnitRef[N]) =
+proc reduce[N](g: var Generator, unit: CompilationUnitRef[N]) {.noSideEffect.} =
   for node in unit.intermediateWidths.keys():
     g.intermediates.add(node)
   for s in unit.stmts:
