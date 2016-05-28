@@ -3,15 +3,15 @@ import tables
 import kaldwin.types
 
 type
-  Checker[LN, RN] = tuple
-    unit: CompilationUnitRef[LN, RN] not nil
+  Checker[N] = tuple
+    unit: CompilationUnitRef[N] not nil
     messages: seq[string]
 
-proc error[LN, RN](c: var Checker[LN, RN], loc: Loc, msg: string) =
+proc error[N](c: var Checker[N], loc: Loc, msg: string) =
   c.messages.add("$1: $2" % [$loc, msg])
 
 # Check the given r-expression, and returns the bit-width of the expression.
-proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
+proc walk[N](c: var Checker[N], e: RExprRef[N]): uint =
   case e.kind
   of rexprNodeRef:
     if e.node in c.unit.inputWidths:
@@ -77,7 +77,7 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: RExprRef[RN]): uint =
   assert result != 0
 
 # Check the given l-expression, and returns the bit-width of the expression.
-proc walk[LN, RN](c: var Checker[LN, RN], e: LExprRef[LN]): uint =
+proc walk[N](c: var Checker[N], e: LExprRef[N]): uint =
   case e.kind
   of lexprNodeRef:
     if e.node in c.unit.outputWidths:
@@ -105,7 +105,7 @@ proc walk[LN, RN](c: var Checker[LN, RN], e: LExprRef[LN]): uint =
 
   assert result != 0
 
-proc walk[LN, RN](c: var Checker[LN, RN], s: StmtRef[LN, RN]) =
+proc walk[N](c: var Checker[N], s: StmtRef[N]) =
   case s.kind
   of stmtAssign:
     let destWidth = c.walk(s.dest)
@@ -121,12 +121,12 @@ proc walk[LN, RN](c: var Checker[LN, RN], s: StmtRef[LN, RN]) =
     for child in s.ifElseChildren:
       c.walk(child)
 
-proc walk[LN, RN](c: var Checker[LN, RN]) =
+proc walk[N](c: var Checker[N]) =
   for s in c.unit.stmts:
     c.walk(s)
 
-proc check*[LN, RN](unit: CompilationUnitRef[LN, RN]): seq[string] =
-  var c: Checker[LN, RN] = (
+proc check*[N](unit: CompilationUnitRef[N]): seq[string] =
+  var c: Checker[N] = (
     unit: unit,
     messages: @[],
   )

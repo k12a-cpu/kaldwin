@@ -50,14 +50,14 @@ proc rope(e: RExprRef[string]): Rope =
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 
-proc rope(s: StmtRef[string, string]): Rope =
+proc rope(s: StmtRef[string]): Rope =
   case s.kind
   of stmtAssign:
     result = &[rope("assign "), rope(s.dest), rope(" = "), rope(s.source), rope(";\n")]
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc rope(unit: CompilationUnitRef[string, string], moduleName: string = "kaldwin_output"): Rope =
+proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): Rope =
   result = &[rope("module "), rope(moduleName)]
   
   var portLines: seq[Rope] = @[]
@@ -87,5 +87,5 @@ proc rope(unit: CompilationUnitRef[string, string], moduleName: string = "kaldwi
   
   result = &[result, rope("\nendmodule\n")]
 
-proc generateVerilog*(unit: CompilationUnitRef[string, string], moduleName: string = "kaldwin_output"): string =
+proc generateVerilog*(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): string =
   $rope(unit, moduleName)

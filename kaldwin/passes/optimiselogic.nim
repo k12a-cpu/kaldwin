@@ -2,27 +2,27 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 
-proc isZero[RN](e: RExprRef[RN]): bool =
+proc isZero[N](e: RExprRef[N]): bool =
   e.kind == rexprLiteral and e.literalValue == 0u64
 
-proc isOne[RN](e: RExprRef[RN]): bool =
+proc isOne[N](e: RExprRef[N]): bool =
   e.kind == rexprLiteral and e.literalValue == 1u64
 
-proc isUndefined[RN](e: RExprRef[RN]): bool =
+proc isUndefined[N](e: RExprRef[N]): bool =
   e.kind == rexprUndefined
 
-proc makeNot[RN](a: RExprRef[RN]): RExprRef[RN] =
+proc makeNot[N](a: RExprRef[N]): RExprRef[N] =
   if a.kind == rexprNot:
     a.notChild
   else:
-    RExprRef[RN](
+    RExprRef[N](
       loc: generatedLoc,
       kind: rexprNot,
       notChild: a,
     )
 
-proc makeAnd[RN](a, b: RExprRef[RN]): RExprRef[RN] =
-  RExprRef[RN](
+proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] =
+  RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,
     op: binaryOpAnd,
@@ -30,8 +30,8 @@ proc makeAnd[RN](a, b: RExprRef[RN]): RExprRef[RN] =
     rightChild: b,
   )
 
-proc makeOr[RN](a, b: RExprRef[RN]): RExprRef[RN] =
-  RExprRef[RN](
+proc makeOr[N](a, b: RExprRef[N]): RExprRef[N] =
+  RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,
     op: binaryOpOr,
@@ -39,14 +39,14 @@ proc makeOr[RN](a, b: RExprRef[RN]): RExprRef[RN] =
     rightChild: b,
   )
 
-proc walk[RN](e: var RExprRef[RN]) =
-  let zero = RExprRef[RN](
+proc walk[N](e: var RExprRef[N]) =
+  let zero = RExprRef[N](
     loc: generatedLoc,
     kind: rexprLiteral,
     literalWidth: 1u,
     literalValue: 0u64,
   )
-  let one = RExprRef[RN](
+  let one = RExprRef[N](
     loc: generatedLoc,
     kind: rexprLiteral,
     literalWidth: 1u,
@@ -131,16 +131,16 @@ proc walk[RN](e: var RExprRef[RN]) =
   of rexprSlice:
     walk(e.sliceChild)
 
-proc walk[LN, RN](s: StmtRef[LN, RN]) =
+proc walk[N](s: StmtRef[N]) =
   case s.kind
   of stmtAssign:
     walk(s.source)
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc walk[LN, RN](unit: CompilationUnitRef[LN, RN]) =
+proc walk[N](unit: CompilationUnitRef[N]) =
   for s in unit.stmts:
     walk(s)
 
-proc optimiseLogic*[LN, RN](unit: CompilationUnitRef[LN, RN]) =
+proc optimiseLogic*[N](unit: CompilationUnitRef[N]) =
   walk(unit)

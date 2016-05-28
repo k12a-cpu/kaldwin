@@ -10,7 +10,7 @@ proc getOrDefault[A, B](t: Table[A, B], key: A, defaultValue: B): B =
   else:
     defaultValue
 
-proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context: var Table[LN, RExprRef[RN]]) =
+proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, RExprRef[N]]) =
   case s.kind
   of stmtAssign:
     assert(s.dest.kind == lexprNodeRef)
@@ -26,7 +26,7 @@ proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context:
       walk(child, unit, elseContext)
 
     # Enumerate all output nodes in the two contexts.
-    var outputNodeSet: HashSet[LN]
+    var outputNodeSet: HashSet[N]
     outputNodeSet.init()
     for node in thenContext.keys():
       outputNodeSet.incl(node)
@@ -35,7 +35,7 @@ proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context:
 
     # For each output node, create a multiplexer between the two possible values coming from the two branches.
     for outputNode in outputNodeSet.items():
-      let undefined = RExprRef[RN](
+      let undefined = RExprRef[N](
         loc: generatedLoc,
         kind: rexprUndefined,
         undefinedWidth: unit.outputWidths[outputNode],
@@ -45,7 +45,7 @@ proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context:
       if thenExpr == elseExpr:
         context[outputNode] = thenExpr
       else:
-        context[outputNode] = RExprRef[RN](
+        context[outputNode] = RExprRef[N](
           loc: generatedLoc,
           kind: rexprMux,
           muxCondition: s.ifCondition,
@@ -53,18 +53,18 @@ proc walk[LN, RN](s: StmtRef[LN, RN], unit: CompilationUnitRef[LN, RN], context:
           muxElse: elseExpr,
         )
 
-proc flattenBranches*[LN, RN](unit: CompilationUnitRef[LN, RN]) =
-  var context = initTable[LN, RExprRef[RN]]()
+proc flattenBranches*[N](unit: CompilationUnitRef[N]) =
+  var context = initTable[N, RExprRef[N]]()
   for s in unit.stmts:
     walk(s, unit, context)
 
   unit.stmts = @[]
   for node, e in context.pairs():
-    unit.stmts.add(StmtRef[LN, RN](
+    unit.stmts.add(StmtRef[N](
       loc: generatedLoc,
       kind: stmtAssign,
       source: e,
-      dest: LExprRef[LN](
+      dest: LExprRef[N](
         loc: generatedLoc,
         kind: lexprNodeRef,
         node: node,

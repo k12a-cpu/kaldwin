@@ -78,25 +78,25 @@ type
     stmtAssign
     stmtIf
   
-  Stmt*[LN, RN] = object
+  Stmt*[N] = object
     loc*: Loc
     case kind*: StmtKind
     of stmtAssign:
-      source*: ref RExpr[RN]
-      dest*: ref LExpr[LN]
+      source*: ref RExpr[N]
+      dest*: ref LExpr[N]
     of stmtIf:
-      ifCondition*: ref RExpr[RN]
-      ifThenChildren*: seq[ref Stmt[LN, RN]]
-      ifElseChildren*: seq[ref Stmt[LN, RN]]
+      ifCondition*: ref RExpr[N]
+      ifThenChildren*: seq[ref Stmt[N]]
+      ifElseChildren*: seq[ref Stmt[N]]
   
-  StmtRef*[LN, RN] = ref Stmt[LN, RN]
+  StmtRef*[N] = ref Stmt[N]
   
-  CompilationUnit*[LN, RN] = object
-    inputWidths*: Table[LN, uint]
-    outputWidths*: Table[RN, uint]
-    stmts*: seq[ref Stmt[LN, RN]]
+  CompilationUnit*[N] = object
+    inputWidths*: Table[N, uint]
+    outputWidths*: Table[N, uint]
+    stmts*: seq[ref Stmt[N]]
   
-  CompilationUnitRef*[LN, RN] = ref CompilationUnit[LN, RN]
+  CompilationUnitRef*[N] = ref CompilationUnit[N]
 
 proc `$`*(loc: Loc): string =
   "$1:$2" % [loc.filename, $loc.lineno]

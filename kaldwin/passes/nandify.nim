@@ -2,15 +2,15 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in nandify>", lineno: 0)
 
-proc makeNot[RN](a: RExprRef[RN]): RExprRef[RN] =
-  RExprRef[RN](
+proc makeNot[N](a: RExprRef[N]): RExprRef[N] =
+  RExprRef[N](
     loc: generatedLoc,
     kind: rexprNot,
     notChild: a,
   )
 
-proc makeNand[RN](a, b: RExprRef[RN]): RExprRef[RN] =
-  RExprRef[RN](
+proc makeNand[N](a, b: RExprRef[N]): RExprRef[N] =
+  RExprRef[N](
     loc: generatedLoc,
     kind: rexprBinaryOp,
     op: binaryOpNand,
@@ -18,14 +18,14 @@ proc makeNand[RN](a, b: RExprRef[RN]): RExprRef[RN] =
     rightChild: b,
   )
 
-proc xorToNand[RN](a, b: RExprRef[RN]): RExprRef[RN] =
+proc xorToNand[N](a, b: RExprRef[N]): RExprRef[N] =
   let p = makeNand(a, b)
   result = makeNand(makeNand(a, p), makeNand(b, p))
 
-proc muxToNand[RN](cond, then, els: RExprRef[RN]): RExprRef[RN] =
+proc muxToNand[N](cond, then, els: RExprRef[N]): RExprRef[N] =
   makeNand(makeNand(cond, then), makeNand(makeNot(cond), els))
 
-proc walk[RN](e: var RExprRef[RN]) =
+proc walk[N](e: var RExprRef[N]) =
   case e.kind
   of rexprNodeRef, rexprLiteral, rexprUndefined:
     discard # doesn't need modification
@@ -55,16 +55,16 @@ proc walk[RN](e: var RExprRef[RN]) =
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 
-proc walk[LN, RN](s: StmtRef[LN, RN]) =
+proc walk[N](s: StmtRef[N]) =
   case s.kind
   of stmtAssign:
     walk(s.source)
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc walk[LN, RN](unit: CompilationUnitRef[LN, RN]) =
+proc walk[N](unit: CompilationUnitRef[N]) =
   for s in unit.stmts:
     walk(s)
 
-proc nandify*[LN, RN](unit: CompilationUnitRef[LN, RN]) =
+proc nandify*[N](unit: CompilationUnitRef[N]) =
   walk(unit)

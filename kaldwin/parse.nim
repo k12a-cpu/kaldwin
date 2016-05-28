@@ -13,8 +13,8 @@ type
 var currentFilename: string
 var currentLineno {.header: "lexer_gen.h", importc: "kaldwin_yylineno".}: int
 
-var unit: CompilationUnitRef[string, string]
-var stmtStack: seq[StmtRef[string, string]] = @[]
+var unit: CompilationUnitRef[string]
+var stmtStack: seq[StmtRef[string]] = @[]
 var lexprStack: seq[LExprRef[string]] = @[]
 var rexprStack: seq[RExprRef[string]] = @[]
 
@@ -50,7 +50,7 @@ proc finish(numStatements: uint64) {.cdecl, exportc: "kaldwin_yy_finish".} =
 proc constructStmtAssignment() {.cdecl, exportc: "kaldwin_yy_construct_stmt_assignment".} =
   let source = rexprStack.pop()
   let dest = lexprStack.pop()
-  stmtStack.add(StmtRef[string, string](
+  stmtStack.add(StmtRef[string](
     loc: currentLoc(),
     kind: stmtAssign,
     source: source,
@@ -61,7 +61,7 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
   let elseChildren = stmtStack.popn(int(numElseChildren))
   let thenChildren = stmtStack.popn(int(numThenChildren))
   let condition = rexprStack.pop()
-  stmtStack.add(StmtRef[string, string](
+  stmtStack.add(StmtRef[string](
     loc: currentLoc(),
     kind: stmtIf,
     ifCondition: condition,
@@ -170,14 +170,14 @@ proc constructRExprMultiply(count: uint64) {.cdecl, exportc: "kaldwin_yy_constru
 proc parseStdinInternal() {.cdecl, header: "parser.h", importc: "kaldwin_parse_stdin".}
 proc parseFileInternal(filename: cstring) {.cdecl, header: "parser.h", importc: "kaldwin_parse_file".}
 
-proc parseStdin*(): CompilationUnitRef[string, string] =
+proc parseStdin*(): CompilationUnitRef[string] =
   reset()
   currentFilename = "<stdin>"
   parseStdinInternal()
   result = unit
   reset()
 
-proc parseFile*(filename: string): CompilationUnitRef[string, string] =
+proc parseFile*(filename: string): CompilationUnitRef[string] =
   reset()
   currentFilename = filename
   parseFileInternal(filename)
