@@ -150,16 +150,30 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
       rope(i),
       rope(" : NAND[4] (\n    in0 => {"),
       rope(mgroup[0].a, namespace),
+      rope(", "),
+      rope(mgroup[1].a, namespace),
+      rope(", "),
+      rope(mgroup[2].a, namespace),
+      rope(", "),
+      rope(mgroup[3].a, namespace),
+      rope("},\n    in1 => {"),
+      rope(mgroup[0].b, namespace),
+      rope(", "),
+      rope(mgroup[1].b, namespace),
+      rope(", "),
+      rope(mgroup[2].b, namespace),
+      rope(", "),
+      rope(mgroup[3].b, namespace),
+      rope("},\n    out => {"),
+      rope(mgroup[0].q, namespace),
+      rope(", "),
+      rope(mgroup[1].q, namespace),
+      rope(", "),
+      rope(mgroup[2].q, namespace),
+      rope(", "),
+      rope(mgroup[3].q, namespace),
+      rope("},\n)\n")
     ]
-    for nand in mgroup[1 .. len(mgroup) - 1]:
-      result = &[result, rope(", "), rope(nand.a, namespace)]
-    result = &[result, rope("},\n    in1 => {"), rope(mgroup[0].b, namespace)]
-    for nand in mgroup[1 .. len(mgroup) - 1]:
-      result = &[result, rope(", "), rope(nand.b, namespace)]
-    result = &[result, rope("},\n    out => {"), rope(mgroup[0].q, namespace)]
-    for nand in mgroup[1 .. len(mgroup) - 1]:
-      result = &[result, rope(", "), rope(nand.q, namespace)]
-    result = &[result, rope("},\n)\n")]
     inc i
 
   for i in 0 .. disconnectedCount-1:
