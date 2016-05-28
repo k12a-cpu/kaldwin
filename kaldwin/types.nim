@@ -1,4 +1,5 @@
 from strutils import `%`
+import hashes
 import tables
 
 type
@@ -101,3 +102,57 @@ type
 
 proc `$`*(loc: Loc): string =
   "$1:$2" % [loc.filename, $loc.lineno]
+
+proc hash*[N](e: LExprRef[N]): Hash =
+  result = result !& hash(e.kind)
+
+  case e.kind
+  of lexprNodeRef:
+    result = result !& hash(e.node)
+  of lexprConcat:
+    for child in e.concatChildren:
+      result = result !& hash(child)
+  of lexprSlice:
+    result = result !& hash(e.sliceUpperBound) !& hash(e.sliceLowerBound) !& hash(e.sliceChild)
+  
+  result = !$result
+
+proc hash*[N](e: RExprRef[N]): Hash =
+  result = result !& hash(e.kind)
+  
+  case e.kind
+  of rexprNodeRef:
+    result = result !& hash(e.node)
+  of rexprLiteral:
+    result = result !& hash(e.literalWidth) !& hash(e.literalValue)
+  of rexprUndefined:
+    result = result !& hash(e.undefinedWidth)
+  of rexprNot:
+    result = result !& hash(e.notChild)
+  of rexprBinaryOp:
+    result = result !& hash(e.op) !& hash(e.leftChild) !& hash(e.rightChild)
+  of rexprMux:
+    result = result !& hash(e.muxCondition) !& hash(e.muxThen) !& hash(e.muxElse)
+  of rexprConcat:
+    for child in e.concatChildren:
+      result = result !& hash(child)
+  of rexprMultiply:
+    result = result !& hash(e.multiplyCount) !& hash(e.multiplyChild)
+  of rexprSlice:
+    result = result !& hash(e.sliceUpperBound) !& hash(e.sliceLowerBound) !& hash(e.sliceChild)
+  
+  result = !$result
+
+proc hash*[N](s: StmtRef[N]): Hash =
+  result = result !& hash(s.kind)
+  
+  case s.kind
+  of stmtAssign:
+    result = result !& hash(s.source) !& hash(s.dest)
+  of stmtIf:
+    result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) & hash(s.ifElseChildren)
+  
+  result = !$result
+
+proc hash*[N](unit: CompilationUnitRef[N]): Hash =
+  result = !$(result !& hash(unit.inputWidths) !& hash(unit.intermediateWidths) !& hash(unit.outputWidths) !& hash(unit.stmts))
