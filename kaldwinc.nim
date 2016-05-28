@@ -4,6 +4,7 @@ import kaldwin.passes.check
 import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
 import kaldwin.passes.nandify
+import kaldwin.passes.gvn
 import kaldwin.generators.verilog
 
 let unit = parseStdin()
@@ -38,6 +39,12 @@ echo()
 echo()
 
 optimiseLogic(unit)
+echo $unit
+echo()
+echo()
+echo()
+
+runGVN(unit)
 echo $unit
 echo()
 echo()
