@@ -21,6 +21,7 @@ var rexprStack: seq[RExprRef[string]] = @[]
 proc reset() =
   unit.new()
   unit.inputWidths = initTable[string, int]()
+  unit.intermediateWidths = initTable[string, int]()
   unit.outputWidths = initTable[string, int]()
   stmtStack.setLen(0)
   lexprStack.setLen(0)
