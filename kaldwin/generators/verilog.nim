@@ -59,7 +59,7 @@ proc rope(s: StmtRef[string]): Rope =
 
 proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): Rope =
   result = &[rope("module "), rope(moduleName)]
-  
+
   var portLines: seq[Rope] = @[]
   for node, width in unit.inputWidths.pairs():
     var portLine = rope("    input logic ")
@@ -73,15 +73,15 @@ proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output
       portLine = &[portLine, rope("["), rope(width-1), rope(":0] ")]
     portLine = &[portLine, rope(node)]
     portLines.add(portLine)
-  
+
   if len(portLines) > 0:
     result = &[result, rope("(\n")]
     for portLine in portLines[0 .. len(portLines)-2]:
       result = &[result, portLine, rope(",\n")]
     result = &[result, portLines[len(portLines)-1], rope("\n)")]
-  
+
   result = &[result, rope(";\n\n")]
-  
+
   for node, width in unit.intermediateWidths.pairs():
     result = &[result, "logic "]
     if width != 1:
@@ -90,7 +90,7 @@ proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output
 
   for s in unit.stmts:
     result = &[result, rope(s)]
-  
+
   result = &[result, rope("\nendmodule\n")]
 
 proc generateVerilog*(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_output"): string =
