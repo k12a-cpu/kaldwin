@@ -130,8 +130,18 @@ proc rope(buffers: seq[Buffer], namespace: Rope): Rope =
     ]
 
 proc rope(nands: seq[Nand], namespace: Rope): Rope =
+  var disconnectedCount = 0
   var i = 0
   for group in nands.chunks(4):
+    var mgroup = group
+    while mgroup.len() < 4:
+      mgroup.add((
+        a: false.toWireOrLiteral(),
+        b: false.toWireOrLiteral(),
+        q: "·disconnected·" & $disconnectedCount,
+      ))
+      inc disconnectedCount
+
     result = &[
       result,
       rope("create "),
@@ -139,18 +149,26 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
       rope("·nand"),
       rope(i),
       rope(" : NAND[4] (\n    in0 => {"),
-      rope(group[0].a, namespace),
+      rope(mgroup[0].a, namespace),
     ]
-    for nand in group[1 .. len(group) - 1]:
+    for nand in mgroup[1 .. len(mgroup) - 1]:
       result = &[result, rope(", "), rope(nand.a, namespace)]
-    result = &[result, rope("},\n    in1 => {"), rope(group[0].b, namespace)]
-    for nand in group[1 .. len(group) - 1]:
+    result = &[result, rope("},\n    in1 => {"), rope(mgroup[0].b, namespace)]
+    for nand in mgroup[1 .. len(mgroup) - 1]:
       result = &[result, rope(", "), rope(nand.b, namespace)]
-    result = &[result, rope("},\n    out => {"), rope(group[0].q, namespace)]
-    for nand in group[1 .. len(group) - 1]:
+    result = &[result, rope("},\n    out => {"), rope(mgroup[0].q, namespace)]
+    for nand in mgroup[1 .. len(mgroup) - 1]:
       result = &[result, rope(", "), rope(nand.q, namespace)]
     result = &[result, rope("},\n)\n")]
     inc i
+
+  for i in 0 .. disconnectedCount-1:
+    result = &[
+      result,
+      rope("node "),
+      rope("·disconnected·" & $i, namespace),
+      rope(" : bit;\n"),
+    ]
 
 proc rope(g: Generator, namespace: Rope): Rope =
   &[rope(g.intermediates, namespace), rope(g.buffers, namespace), rope(g.nands, namespace)]
