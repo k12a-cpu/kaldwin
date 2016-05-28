@@ -144,6 +144,14 @@ proc rope*[N](unit: CompilationUnitRef[N]): Rope =
   if len(unit.inputWidths) > 0:
     result = result & rope("\n")
 
+  for node, width in unit.intermediateWidths.pairs():
+    result = &[result, rope("intermediate "), rope(node)]
+    if width != 1:
+      result = &[result, rope("["), rope(width), rope("]")]
+    result = &[result, rope(";\n")]
+  if len(unit.outputWidths) > 0:
+    result = result & rope("\n")
+
   for node, width in unit.outputWidths.pairs():
     result = &[result, rope("output "), rope(node)]
     if width != 1:

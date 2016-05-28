@@ -93,6 +93,7 @@ type
   
   CompilationUnit*[N] = object
     inputWidths*: Table[N, uint]
+    intermediateWidths*: Table[N, uint]
     outputWidths*: Table[N, uint]
     stmts*: seq[ref Stmt[N]]
   
