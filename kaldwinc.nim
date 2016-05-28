@@ -4,6 +4,7 @@ import kaldwin.passes.check
 import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
 import kaldwin.passes.nandify
+import kaldwin.generators.verilog
 
 let unit = parseStdin()
 
@@ -41,3 +42,5 @@ echo $unit
 echo()
 echo()
 echo()
+
+echo generateVerilog(unit)
