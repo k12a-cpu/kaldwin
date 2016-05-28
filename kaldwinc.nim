@@ -5,7 +5,7 @@ import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
 import kaldwin.passes.nandify
 import kaldwin.passes.gvn
-import kaldwin.generators.verilog
+import kaldwin.generators.attano
 
 let unit = parseStdin()
 
@@ -50,4 +50,4 @@ echo()
 echo()
 echo()
 
-echo generateVerilog(unit)
+echo generateAttano(unit)
