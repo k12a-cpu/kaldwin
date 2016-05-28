@@ -1,3 +1,4 @@
+import docopt
 import kaldwin.parse
 import kaldwin.stringify
 import kaldwin.passes.check
@@ -7,7 +8,28 @@ import kaldwin.passes.nandify
 import kaldwin.passes.gvn
 import kaldwin.generators.attano
 
-let unit = parseStdin()
+const doc = """
+kaldwinc - Compiler for the Kaldwin logic specification language.
+
+Usage:
+  kaldwinc [options] [<infile>]
+
+Options:
+  -h, --help                          Print this help text.
+  -o <outfile>, --output <outfile>    Write output to <outfile>, instead of to
+                                      standard output.
+  -p <prefix>, --prefix <prefix>      Use <prefix> as the prefix for
+                                      automatically generated gates and nodes.
+                                      [default: kaldwin_out]
+"""
+
+let args = docopt(doc)
+
+let unit =
+  if args["<infile>"]:
+    parseFile($args["<infile>"])
+  else:
+    parseStdin()
 
 let messages = check(unit)
 if messages.len() > 0:
@@ -15,39 +37,15 @@ if messages.len() > 0:
     echo message
   quit(1)
 
-echo $unit
-echo()
-echo()
-echo()
-
 flattenBranches(unit)
-echo $unit
-echo()
-echo()
-echo()
-
 optimiseLogic(unit)
-echo $unit
-echo()
-echo()
-echo()
-
 nandify(unit)
-echo $unit
-echo()
-echo()
-echo()
-
 optimiseLogic(unit)
-echo $unit
-echo()
-echo()
-echo()
-
 runGVN(unit)
-echo $unit
-echo()
-echo()
-echo()
 
-echo generateAttano(unit)
+let output = generateAttano(unit, namespace = $args["--prefix"])
+
+if args["--output"]:
+  writeFile($args["--output"], output)
+else:
+  echo output
