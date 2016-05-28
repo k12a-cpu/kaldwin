@@ -20,8 +20,8 @@ var rexprStack: seq[RExprRef[string]] = @[]
 
 proc reset() =
   unit.new()
-  unit.inputWidths = initTable[string, uint]()
-  unit.outputWidths = initTable[string, uint]()
+  unit.inputWidths = initTable[string, int]()
+  unit.outputWidths = initTable[string, int]()
   stmtStack.setLen(0)
   lexprStack.setLen(0)
   rexprStack.setLen(0)
@@ -70,18 +70,18 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
   ))
 
 proc addInput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_input".} =
-  unit.inputWidths[$name] = uint(bits)
+  unit.inputWidths[$name] = int(bits)
 
 proc addOutput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_output".} =
-  unit.outputWidths[$name] = uint(bits)
+  unit.outputWidths[$name] = int(bits)
 
 proc constructLExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_slice".} =
   let child = lexprStack.pop()
   lexprStack.add(LExprRef[string](
     loc: currentLoc(),
     kind: lexprSlice,
-    sliceUpperBound: uint(upperBound),
-    sliceLowerBound: uint(lowerBound),
+    sliceUpperBound: int(upperBound),
+    sliceLowerBound: int(lowerBound),
     sliceChild: child,
   ))
 
@@ -113,8 +113,8 @@ proc constructRExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kald
   rexprStack.add(RExprRef[string](
     loc: currentLoc(),
     kind: rexprSlice,
-    sliceUpperBound: uint(upperBound),
-    sliceLowerBound: uint(lowerBound),
+    sliceUpperBound: int(upperBound),
+    sliceLowerBound: int(lowerBound),
     sliceChild: child,
   ))
 
@@ -146,8 +146,8 @@ proc constructRExprLiteral(width: uint64, value: uint64) {.cdecl, exportc: "kald
   rexprStack.add(RExprRef[string](
     loc: currentLoc(),
     kind: rexprLiteral,
-    literalWidth: uint(width),
-    literalValue: value,
+    literalWidth: int(width),
+    literalValue: int(value),
   ))
 
 proc constructRExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_concat".} =
@@ -163,7 +163,7 @@ proc constructRExprMultiply(count: uint64) {.cdecl, exportc: "kaldwin_yy_constru
   rexprStack.add(RExprRef[string](
     loc: currentLoc(),
     kind: rexprMultiply,
-    multiplyCount: uint(count),
+    multiplyCount: int(count),
     multiplyChild: child,
   ))
 

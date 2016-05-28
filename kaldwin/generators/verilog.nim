@@ -2,15 +2,6 @@ from tables import pairs
 import ropes
 import kaldwin.types
 
-# There's probably a reason why these aren't implemented in the standard library
-# module.
-when not compiles(rope(0u)):
-  proc rope(x: uint): Rope =
-    rope(int(x))
-when not compiles(rope(0u64)):
-  proc rope(x: uint64): Rope =
-    rope(int(x))
-
 proc rope(e: LExprRef[string]): Rope =
   case e.kind
   of lexprNodeRef:

@@ -11,7 +11,7 @@ proc error[N](c: var Checker[N], loc: Loc, msg: string) =
   c.messages.add("$1: $2" % [$loc, msg])
 
 # Check the given r-expression, and returns the bit-width of the expression.
-proc walk[N](c: var Checker[N], e: RExprRef[N]): uint =
+proc walk[N](c: var Checker[N], e: RExprRef[N]): int =
   case e.kind
   of rexprNodeRef:
     if e.node in c.unit.inputWidths:
@@ -25,9 +25,9 @@ proc walk[N](c: var Checker[N], e: RExprRef[N]): uint =
 
   of rexprLiteral:
     # 64 will probably work, but don't want to take the risk
-    if e.literalWidth > 63u:
+    if e.literalWidth > 63:
       c.error(e.loc, "literal widths greater than 63 are not supported")
-    let max = (1u64 shl e.literalWidth) - 1u64
+    let max = (1 shl e.literalWidth) - 1
     if e.literalValue > max:
       c.error(e.loc, "literal value is greater than the largest representable $1-bit value ($2)" % [$e.literalWidth, $max])
     result = e.literalWidth
@@ -67,17 +67,17 @@ proc walk[N](c: var Checker[N], e: RExprRef[N]): uint =
   of rexprSlice:
     let childWidth = c.walk(e.sliceChild)
     if e.sliceUpperBound >= childWidth:
-      c.error(e.loc, "upper bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceUpperBound, $(childWidth-1u)])
+      c.error(e.loc, "upper bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceUpperBound, $(childWidth-1)])
     if e.sliceLowerBound >= childWidth:
-      c.error(e.loc, "lower bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceLowerBound, $(childWidth-1u)])
+      c.error(e.loc, "lower bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceLowerBound, $(childWidth-1)])
     if e.sliceUpperBound < e.sliceLowerBound:
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
-    result = e.sliceUpperBound - e.sliceLowerBound + 1u
+    result = e.sliceUpperBound - e.sliceLowerBound + 1
 
   assert result != 0
 
 # Check the given l-expression, and returns the bit-width of the expression.
-proc walk[N](c: var Checker[N], e: LExprRef[N]): uint =
+proc walk[N](c: var Checker[N], e: LExprRef[N]): int =
   case e.kind
   of lexprNodeRef:
     if e.node in c.unit.outputWidths:
@@ -96,12 +96,12 @@ proc walk[N](c: var Checker[N], e: LExprRef[N]): uint =
   of lexprSlice:
     let childWidth = c.walk(e.sliceChild)
     if e.sliceUpperBound >= childWidth:
-      c.error(e.loc, "upper bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceUpperBound, $(childWidth-1u)])
+      c.error(e.loc, "upper bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceUpperBound, $(childWidth-1)])
     if e.sliceLowerBound >= childWidth:
-      c.error(e.loc, "lower bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceLowerBound, $(childWidth-1u)])
+      c.error(e.loc, "lower bound '$1' out of range (must be in range 0..$2 inclusive)" % [$e.sliceLowerBound, $(childWidth-1)])
     if e.sliceUpperBound < e.sliceLowerBound:
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
-    result = e.sliceUpperBound - e.sliceLowerBound + 1u
+    result = e.sliceUpperBound - e.sliceLowerBound + 1
 
   assert result != 0
 

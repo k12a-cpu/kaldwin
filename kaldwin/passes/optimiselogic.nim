@@ -3,10 +3,10 @@ import kaldwin.types
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 
 proc isZero[N](e: RExprRef[N]): bool =
-  e.kind == rexprLiteral and e.literalValue == 0u64
+  e.kind == rexprLiteral and e.literalValue == 0
 
 proc isOne[N](e: RExprRef[N]): bool =
-  e.kind == rexprLiteral and e.literalValue == 1u64
+  e.kind == rexprLiteral and e.literalValue == 1
 
 proc isUndefined[N](e: RExprRef[N]): bool =
   e.kind == rexprUndefined
@@ -43,14 +43,14 @@ proc walk[N](e: var RExprRef[N]) =
   let zero = RExprRef[N](
     loc: generatedLoc,
     kind: rexprLiteral,
-    literalWidth: 1u,
-    literalValue: 0u64,
+    literalWidth: 1,
+    literalValue: 0,
   )
   let one = RExprRef[N](
     loc: generatedLoc,
     kind: rexprLiteral,
-    literalWidth: 1u,
-    literalValue: 1u64,
+    literalWidth: 1,
+    literalValue: 1,
   )
 
   case e.kind

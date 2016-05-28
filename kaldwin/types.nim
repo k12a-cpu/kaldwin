@@ -26,8 +26,8 @@ type
     of lexprConcat:
       concatChildren*: seq[ref LExpr[N]]
     of lexprSlice:
-      sliceUpperBound*: uint
-      sliceLowerBound*: uint
+      sliceUpperBound*: int
+      sliceLowerBound*: int
       sliceChild*: ref LExpr[N]
   
   LExprRef*[N] = ref LExpr[N]
@@ -49,10 +49,10 @@ type
     of rexprNodeRef:
       node*: N
     of rexprLiteral:
-      literalWidth*: uint
-      literalValue*: uint64
+      literalWidth*: int
+      literalValue*: int
     of rexprUndefined:
-      undefinedWidth*: uint
+      undefinedWidth*: int
     of rexprNot:
       notChild*: ref RExpr[N]
     of rexprBinaryOp:
@@ -66,11 +66,11 @@ type
     of rexprConcat:
       concatChildren*: seq[ref RExpr[N]]
     of rexprMultiply:
-      multiplyCount*: uint
+      multiplyCount*: int
       multiplyChild*: ref RExpr[N]
     of rexprSlice:
-      sliceUpperBound*: uint
-      sliceLowerBound*: uint
+      sliceUpperBound*: int
+      sliceLowerBound*: int
       sliceChild*: ref RExpr[N]
   
   RExprRef*[N] = ref RExpr[N]
@@ -93,9 +93,9 @@ type
   StmtRef*[N] = ref Stmt[N]
   
   CompilationUnit*[N] = object
-    inputWidths*: Table[N, uint]
-    intermediateWidths*: Table[N, uint]
-    outputWidths*: Table[N, uint]
+    inputWidths*: Table[N, int]
+    intermediateWidths*: Table[N, int]
+    outputWidths*: Table[N, int]
     stmts*: seq[ref Stmt[N]]
   
   CompilationUnitRef*[N] = ref CompilationUnit[N]
