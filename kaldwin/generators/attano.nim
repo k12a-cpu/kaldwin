@@ -12,15 +12,15 @@ type
       wire: Wire
     of true:
       literal: Literal
-  
+
   Buffer = tuple
     a: WireOrLiteral
     q: Wire
-  
+
   Nand = tuple
     a, b: WireOrLiteral
     q: Wire
-  
+
   Generator = tuple
     intermediates: seq[Wire]
     buffers: seq[Buffer]
@@ -51,11 +51,11 @@ proc addNand(g: var Generator, q: Wire, a, b: WireOrLiteral) =
 proc reduce[N](g: var Generator, s: StmtRef[N]) =
   assert(s.kind == stmtAssign, "only stmtAssign should be present at this stage")
   assert(s.dest.kind == lexprNodeRef, "only lexprNodeRef should be present at this stage")
-  
+
   case s.source.kind
   of rexprNodeRef:
     g.addBuffer(s.dest.node, s.source.node.toWireOrLiteral())
-  
+
   of rexprLiteral:
     assert(s.source.literalWidth == 1, "only literals of width 1 should be present at this stage")
     if s.source.literalValue == 0:
@@ -64,29 +64,29 @@ proc reduce[N](g: var Generator, s: StmtRef[N]) =
       g.addBuffer(s.dest.node, true.toWireOrLiteral())
     else:
       assert(false, "literals should only have values of 0 or 1 at this stage")
-  
+
   of rexprUndefined:
     assert(false, "rexprUndefined should not be present at this stage")
-  
+
   of rexprNot:
     assert(s.source.notChild.kind == rexprNodeRef, "only rexprNodeRef should be present as the child of a rexprNot at this stage")
     g.addNand(s.dest.node, s.source.notChild.node.toWireOrLiteral(), true.toWireOrLiteral())
-  
+
   of rexprBinaryOp:
     assert(s.source.op == binaryOpNand, "only binaryOpNand should be present at this stage")
     assert(s.source.leftChild.kind == rexprNodeRef, "only rexprNodeRef should be present as the child of a rexprNand at this stage")
     assert(s.source.rightChild.kind == rexprNodeRef, "only rexprNodeRef should be present as the child of a rexprNand at this stage")
     g.addNand(s.dest.node, s.source.leftChild.node.toWireOrLiteral(), s.source.rightChild.node.toWireOrLiteral())
-  
+
   of rexprMux:
     assert(false, "rexprMux should not be present at this stage")
-  
+
   of rexprConcat:
     assert(false, "rexprConcat should not be present at this stage")
-  
+
   of rexprMultiply:
     assert(false, "rexprMultiply should not be present at this stage")
-  
+
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 

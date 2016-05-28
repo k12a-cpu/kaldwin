@@ -12,12 +12,12 @@ type
     binaryOpAnd
     binaryOpOr
     binaryOpXor
-  
+
   LExprKind* = enum
     lexprNodeRef
     lexprConcat
     lexprSlice
-  
+
   LExpr*[N] = object
     loc*: Loc
     case kind*: LExprKind
@@ -29,9 +29,9 @@ type
       sliceUpperBound*: int
       sliceLowerBound*: int
       sliceChild*: ref LExpr[N]
-  
+
   LExprRef*[N] = ref LExpr[N]
-  
+
   RExprKind* = enum
     rexprNodeRef
     rexprLiteral
@@ -42,7 +42,7 @@ type
     rexprConcat
     rexprMultiply
     rexprSlice
-  
+
   RExpr*[N] = object
     loc*: Loc
     case kind*: RExprKind
@@ -72,13 +72,13 @@ type
       sliceUpperBound*: int
       sliceLowerBound*: int
       sliceChild*: ref RExpr[N]
-  
+
   RExprRef*[N] = ref RExpr[N]
-  
+
   StmtKind* = enum
     stmtAssign
     stmtIf
-  
+
   Stmt*[N] = object
     loc*: Loc
     case kind*: StmtKind
@@ -89,15 +89,15 @@ type
       ifCondition*: ref RExpr[N]
       ifThenChildren*: seq[ref Stmt[N]]
       ifElseChildren*: seq[ref Stmt[N]]
-  
+
   StmtRef*[N] = ref Stmt[N]
-  
+
   CompilationUnit*[N] = object
     inputWidths*: Table[N, int]
     intermediateWidths*: Table[N, int]
     outputWidths*: Table[N, int]
     stmts*: seq[ref Stmt[N]]
-  
+
   CompilationUnitRef*[N] = ref CompilationUnit[N]
 
 proc `$`*(loc: Loc): string =
@@ -114,12 +114,12 @@ proc hash*[N](e: LExprRef[N]): Hash =
       result = result !& hash(child)
   of lexprSlice:
     result = result !& hash(e.sliceUpperBound) !& hash(e.sliceLowerBound) !& hash(e.sliceChild)
-  
+
   result = !$result
 
 proc hash*[N](e: RExprRef[N]): Hash =
   result = result !& hash(e.kind)
-  
+
   case e.kind
   of rexprNodeRef:
     result = result !& hash(e.node)
@@ -140,18 +140,18 @@ proc hash*[N](e: RExprRef[N]): Hash =
     result = result !& hash(e.multiplyCount) !& hash(e.multiplyChild)
   of rexprSlice:
     result = result !& hash(e.sliceUpperBound) !& hash(e.sliceLowerBound) !& hash(e.sliceChild)
-  
+
   result = !$result
 
 proc hash*[N](s: StmtRef[N]): Hash =
   result = result !& hash(s.kind)
-  
+
   case s.kind
   of stmtAssign:
     result = result !& hash(s.source) !& hash(s.dest)
   of stmtIf:
     result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) & hash(s.ifElseChildren)
-  
+
   result = !$result
 
 proc hash*[N](unit: CompilationUnitRef[N]): Hash =
