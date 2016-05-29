@@ -26,10 +26,16 @@ Options:
 let args = docopt(doc)
 
 let unit =
-  if args["<infile>"]:
-    parseFile($args["<infile>"])
-  else:
-    parseStdin()
+  try:
+    if args["<infile>"]:
+      parseFile($args["<infile>"])
+    else:
+      parseStdin()
+  except ParseError:
+    let msg = getCurrentExceptionMsg()
+    echo msg
+    quit(1)
+    nil # the compiler requires that all branches return a value, even though this line is unreachable.
 
 let messages = check(unit)
 if messages.len() > 0:
