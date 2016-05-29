@@ -16,21 +16,8 @@
 [ \t\r\n]               ;
 #.*\n                   ;
 
-\(                      { return '('; }
-\)                      { return ')'; }
-\[                      { return '['; }
-\]                      { return ']'; }
-\{                      { return '{'; }
-\}                      { return '}'; }
-=                       { return '='; }
-:                       { return ':'; }
-;                       { return ';'; }
-,                       { return ','; }
-~                       { return '~'; }
-&                       { return '&'; }
-\|                      { return '|'; }
-\^                      { return '^'; }
-x                       { return 'x'; }
+[\(\)\[\]\{\}=:;,~&\|\^x]  { return kaldwin_yytext[0]; }
+
 else                    { return ELSE; }
 if                      { return IF; }
 input                   { return INPUT; }
