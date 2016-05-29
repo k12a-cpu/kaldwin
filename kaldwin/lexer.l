@@ -54,7 +54,7 @@ output                  { return OUTPUT; }
 [0-9]+                  { kaldwin_yylval.u64 = (uint64_t) strtol(kaldwin_yytext, NULL, 10);
                           return INT; }
 
-[a-zA-F_][a-zA-F0-9_]*  { kaldwin_yylval.str = strdup(kaldwin_yytext);
+[a-zA-Z_][a-zA-Z0-9_]*  { kaldwin_yylval.str = strdup(kaldwin_yytext);
                           return IDENT; }
 
 %%
