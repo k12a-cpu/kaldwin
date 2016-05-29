@@ -13,7 +13,7 @@ type
     nextIntermediate: int
 
 proc newIntermediate[N](gvn: var GVN[N], width: int = 1): N {.noSideEffect.} =
-  result = "·gvn·" & $gvn.nextIntermediate
+  result = "__gvn_" & $gvn.nextIntermediate
   inc gvn.nextIntermediate
 
   gvn.unit.intermediateWidths[result] = width

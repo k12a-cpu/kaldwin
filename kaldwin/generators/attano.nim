@@ -103,9 +103,9 @@ proc rope(wol: WireOrLiteral, namespace: Rope): Rope =
     else:
       rope("1'h0")
   else:
-    if wol.wire.startsWith("·"):
+    if wol.wire.startsWith("__"):
       # internally generated node; prepend with namespace
-      &[namespace, rope("·generatednode"), rope(wol.wire)]
+      &[namespace, rope(wol.wire)]
     else:
       rope(wol.wire)
 
@@ -138,7 +138,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
       mgroup.add((
         a: false.toWireOrLiteral(),
         b: false.toWireOrLiteral(),
-        q: "·disconnected·" & $disconnectedCount,
+        q: "__disconnected" & $disconnectedCount,
       ))
       inc disconnectedCount
 
@@ -146,7 +146,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
       result,
       rope("create "),
       namespace,
-      rope("·nand"),
+      rope("_nand"),
       rope(i),
       rope(" : NAND[4] (\n    in0 => {"),
       rope(mgroup[0].a, namespace),
@@ -180,7 +180,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
     result = &[
       result,
       rope("node "),
-      rope("·disconnected·" & $i, namespace),
+      rope("__disconnected" & $i, namespace),
       rope(" : bit;\n"),
     ]
 
