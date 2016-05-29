@@ -172,7 +172,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
       rope(mgroup[2].q, namespace),
       rope(", "),
       rope(mgroup[3].q, namespace),
-      rope("},\n)\n")
+      rope("},\n);\n")
     ]
     inc i
 
