@@ -57,4 +57,8 @@ output                  { return OUTPUT; }
 [a-zA-Z_][a-zA-Z0-9_]*  { kaldwin_yylval.str = strdup(kaldwin_yytext);
                           return IDENT; }
 
+.                       { char msg[24];
+                          snprintf(msg, 24, "invalid character '%c'", kaldwin_yytext[0]);
+                          kaldwin_yyerror(msg); }
+
 %%
