@@ -16,11 +16,15 @@ proc walk[N](c: var Checker[N], e: RExprRef[N]): int =
   of rexprNodeRef:
     if e.node in c.unit.inputWidths:
       result = c.unit.inputWidths[e.node]
+    elif e.node in c.unit.intermediateWidths:
+      result = c.unit.intermediateWidths[e.node]
+    elif e.node in c.unit.outputWidths:
+      result = c.unit.outputWidths[e.node]
     else:
       when compiles($e.node):
-        c.error(e.loc, "undefined reference to input node '$1'" % [$e.node])
+        c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       else:
-        c.error(e.loc, "undefined reference to input node")
+        c.error(e.loc, "undefined reference to node")
       result = 1 # fallback
 
   of rexprLiteral:
@@ -80,13 +84,15 @@ proc walk[N](c: var Checker[N], e: RExprRef[N]): int =
 proc walk[N](c: var Checker[N], e: LExprRef[N]): int =
   case e.kind
   of lexprNodeRef:
-    if e.node in c.unit.outputWidths:
+    if e.node in c.unit.intermediateWidths:
+      result = c.unit.intermediateWidths[e.node]
+    elif e.node in c.unit.outputWidths:
       result = c.unit.outputWidths[e.node]
     else:
       when compiles($e.node):
-        c.error(e.loc, "undefined reference to output node '$1'" % [$e.node])
+        c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       else:
-        c.error(e.loc, "undefined reference to output node")
+        c.error(e.loc, "undefined reference to node")
 
   of lexprConcat:
     for child in e.concatChildren:
