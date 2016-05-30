@@ -21,6 +21,10 @@ Options:
   -p <prefix>, --prefix <prefix>      Use <prefix> as the prefix for
                                       automatically generated gates and nodes.
                                       [default: kaldwin_out]
+  -d <stage>, --dump <stage>          Halt and dump intermediate representation
+                                      after <stage>, where <stage> is one of
+                                      'check', 'flatten', 'opt1', 'nand', 'opt2'
+                                      or 'gvn'.
 """
 
 let args = docopt(doc)
@@ -37,17 +41,41 @@ let unit =
     quit(1)
     nil # the compiler requires that all branches return a value, even though this line is unreachable.
 
+let dump = $args["--dump"]
+
 let messages = check(unit)
 if messages.len() > 0:
   for message in messages:
     echo message
   quit(1)
+if dump == "check":
+  echo $unit
+  quit(0)
 
 flattenBranches(unit)
+if dump == "flatten":
+  echo $unit
+  quit(0)
+
 optimiseLogic(unit)
+if dump == "opt1":
+  echo $unit
+  quit(0)
+
 nandify(unit)
+if dump == "nand":
+  echo $unit
+  quit(0)
+
 optimiseLogic(unit)
+if dump == "opt2":
+  echo $unit
+  quit(0)
+
 runGVN(unit)
+if dump == "gvn":
+  echo $unit
+  quit(0)
 
 let output = generateAttano(unit, namespace = $args["--prefix"])
 
