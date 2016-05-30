@@ -78,7 +78,8 @@ proc walk(c: var Checker, e: RExprRef): int =
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
     result = e.sliceUpperBound - e.sliceLowerBound + 1
 
-  assert result > 0
+  if c.messages.len() == 0:
+    assert result > 0
 
 # Check the given l-expression, and returns the bit-width of the expression.
 proc walk(c: var Checker, e: LExprRef): int =
@@ -109,7 +110,8 @@ proc walk(c: var Checker, e: LExprRef): int =
       c.error(e.loc, "upper bound '$1' must be greater than or equal to lower bound '$2'" % [$e.sliceUpperBound, $e.sliceLowerBound])
     result = e.sliceUpperBound - e.sliceLowerBound + 1
 
-  assert result > 0
+  if c.messages.len() == 0:
+    assert result > 0
 
 proc walk(c: var Checker, s: StmtRef) =
   case s.kind
