@@ -73,6 +73,9 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
 proc addInput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_input".} =
   unit.inputWidths[$name] = int(bits)
 
+proc addIntermediate(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_intermediate".} =
+  unit.intermediateWidths[$name] = int(bits)
+
 proc addOutput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_output".} =
   unit.outputWidths[$name] = int(bits)
 

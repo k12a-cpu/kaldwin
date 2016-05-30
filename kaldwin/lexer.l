@@ -21,6 +21,7 @@
 else                    { return ELSE; }
 if                      { return IF; }
 input                   { return INPUT; }
+intermediate            { return INTERMEDIATE; }
 output                  { return OUTPUT; }
 
 [0-9]+\'b[01]+          { char *endptr;

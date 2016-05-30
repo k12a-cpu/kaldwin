@@ -56,10 +56,11 @@ extern int kaldwin_yydebug;
     ELSE = 258,
     IF = 259,
     INPUT = 260,
-    OUTPUT = 261,
-    INT = 262,
-    IDENT = 263,
-    SIZED_INT = 264
+    INTERMEDIATE = 261,
+    OUTPUT = 262,
+    INT = 263,
+    IDENT = 264,
+    SIZED_INT = 265
   };
 #endif
 
@@ -77,7 +78,7 @@ union KALDWIN_YYSTYPE
         uint64_t value;
     } sized_int;
 
-#line 81 "kaldwin/parser_gen.h" /* yacc.c:1909  */
+#line 82 "kaldwin/parser_gen.h" /* yacc.c:1909  */
 };
 
 typedef union KALDWIN_YYSTYPE KALDWIN_YYSTYPE;

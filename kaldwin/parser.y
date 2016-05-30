@@ -22,6 +22,7 @@
 %token ELSE
 %token IF
 %token INPUT
+%token INTERMEDIATE
 %token OUTPUT
 %token <u64> INT
 %token <str> IDENT
@@ -48,6 +49,8 @@ ports
 port
     : INPUT IDENT ';'                           { kaldwin_yy_add_input($2, 1); }
     | INPUT IDENT '[' INT ']' ';'               { kaldwin_yy_add_input($2, $4); }
+    | INTERMEDIATE IDENT ';'                    { kaldwin_yy_add_intermediate($2, 1); }
+    | INTERMEDIATE IDENT '[' INT ']' ';'        { kaldwin_yy_add_intermediate($2, $4); }
     | OUTPUT IDENT ';'                          { kaldwin_yy_add_output($2, 1); }
     | OUTPUT IDENT '[' INT ']' ';'              { kaldwin_yy_add_output($2, $4); }
     ;
