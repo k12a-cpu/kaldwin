@@ -18,19 +18,19 @@ type
     lexprConcat
     lexprSlice
 
-  LExpr*[N] = object
+  LExpr* = object
     loc*: Loc
     case kind*: LExprKind
     of lexprNodeRef:
-      node*: N
+      node*: string
     of lexprConcat:
-      concatChildren*: seq[ref LExpr[N]]
+      concatChildren*: seq[ref LExpr]
     of lexprSlice:
       sliceUpperBound*: int
       sliceLowerBound*: int
-      sliceChild*: ref LExpr[N]
+      sliceChild*: ref LExpr
 
-  LExprRef*[N] = ref LExpr[N]
+  LExprRef* = ref LExpr
 
   RExprKind* = enum
     rexprNodeRef
@@ -43,67 +43,67 @@ type
     rexprMultiply
     rexprSlice
 
-  RExpr*[N] = object
+  RExpr* = object
     loc*: Loc
     case kind*: RExprKind
     of rexprNodeRef:
-      node*: N
+      node*: string
     of rexprLiteral:
       literalWidth*: int
       literalValue*: int
     of rexprUndefined:
       undefinedWidth*: int
     of rexprNot:
-      notChild*: ref RExpr[N]
+      notChild*: ref RExpr
     of rexprBinaryOp:
       op*: BinaryOp
-      leftChild*: ref RExpr[N]
-      rightChild*: ref RExpr[N]
+      leftChild*: ref RExpr
+      rightChild*: ref RExpr
     of rexprMux:
-      muxCondition*: ref RExpr[N]
-      muxThen*: ref RExpr[N]
-      muxElse*: ref RExpr[N]
+      muxCondition*: ref RExpr
+      muxThen*: ref RExpr
+      muxElse*: ref RExpr
     of rexprConcat:
-      concatChildren*: seq[ref RExpr[N]]
+      concatChildren*: seq[ref RExpr]
     of rexprMultiply:
       multiplyCount*: int
-      multiplyChild*: ref RExpr[N]
+      multiplyChild*: ref RExpr
     of rexprSlice:
       sliceUpperBound*: int
       sliceLowerBound*: int
-      sliceChild*: ref RExpr[N]
+      sliceChild*: ref RExpr
 
-  RExprRef*[N] = ref RExpr[N]
+  RExprRef* = ref RExpr
 
   StmtKind* = enum
     stmtAssign
     stmtIf
 
-  Stmt*[N] = object
+  Stmt* = object
     loc*: Loc
     case kind*: StmtKind
     of stmtAssign:
-      source*: ref RExpr[N]
-      dest*: ref LExpr[N]
+      source*: ref RExpr
+      dest*: ref LExpr
     of stmtIf:
-      ifCondition*: ref RExpr[N]
-      ifThenChildren*: seq[ref Stmt[N]]
-      ifElseChildren*: seq[ref Stmt[N]]
+      ifCondition*: ref RExpr
+      ifThenChildren*: seq[ref Stmt]
+      ifElseChildren*: seq[ref Stmt]
 
-  StmtRef*[N] = ref Stmt[N]
+  StmtRef* = ref Stmt
 
-  CompilationUnit*[N] = object
-    inputWidths*: Table[N, int]
-    intermediateWidths*: Table[N, int]
-    outputWidths*: Table[N, int]
-    stmts*: seq[ref Stmt[N]]
+  CompilationUnit* = object
+    inputWidths*: Table[string, int]
+    intermediateWidths*: Table[string, int]
+    outputWidths*: Table[string, int]
+    stmts*: seq[ref Stmt]
 
-  CompilationUnitRef*[N] = ref CompilationUnit[N]
+  CompilationUnitRef* = ref CompilationUnit
 
 proc `$`*(loc: Loc): string {.noSideEffect.} =
   "$1:$2" % [loc.filename, $loc.lineno]
 
-proc hash*[N](e: LExprRef[N]): Hash {.noSideEffect.} =
+proc hash*(e: LExprRef): Hash {.noSideEffect.} =
   result = result !& hash(e.kind)
 
   case e.kind
@@ -117,7 +117,7 @@ proc hash*[N](e: LExprRef[N]): Hash {.noSideEffect.} =
 
   result = !$result
 
-proc hash*[N](e: RExprRef[N]): Hash {.noSideEffect.} =
+proc hash*(e: RExprRef): Hash {.noSideEffect.} =
   result = result !& hash(e.kind)
 
   case e.kind
@@ -143,7 +143,7 @@ proc hash*[N](e: RExprRef[N]): Hash {.noSideEffect.} =
 
   result = !$result
 
-proc hash*[N](s: StmtRef[N]): Hash {.noSideEffect.} =
+proc hash*(s: StmtRef): Hash {.noSideEffect.} =
   result = result !& hash(s.kind)
 
   case s.kind

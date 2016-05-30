@@ -7,25 +7,25 @@ import kaldwin.types
 const generatedLoc: Loc = (filename: "<generated in gvn>", lineno: 0)
 
 type
-  GVN[N] = tuple
-    unit: CompilationUnitRef[N]
-    exprCache: Table[Hash, RExprRef[N]]
+  GVN = tuple
+    unit: CompilationUnitRef
+    exprCache: Table[Hash, RExprRef]
     nextIntermediate: int
 
-proc newIntermediate[N](gvn: var GVN[N], width: int = 1): N {.noSideEffect.} =
+proc newIntermediate(gvn: var GVN, width: int = 1): string {.noSideEffect.} =
   result = "__gvn_" & $gvn.nextIntermediate
   inc gvn.nextIntermediate
 
   gvn.unit.intermediateWidths[result] = width
 
-proc createAssign[N](gvn: var GVN[N], dest: LExprRef[N], source: RExprRef[N]) {.noSideEffect.} =
-  gvn.unit.stmts.add(StmtRef[N](
+proc createAssign(gvn: var GVN, dest: LExprRef, source: RExprRef) {.noSideEffect.} =
+  gvn.unit.stmts.add(StmtRef(
     loc: generatedLoc,
     source: source,
     dest: dest,
   ))
 
-proc walk[N](gvn: var GVN[N], e: var RExprRef[N]) =
+proc walk(gvn: var GVN, e: var RExprRef) =
   # Walk children
   case e.kind
   of rexprNodeRef, rexprLiteral, rexprUndefined:
@@ -56,13 +56,13 @@ proc walk[N](gvn: var GVN[N], e: var RExprRef[N]) =
     let hash = e.hash()
     if hash notin gvn.exprCache:
       let intermediate = gvn.newIntermediate()
-      let intermediateDest = LExprRef[N](loc: generatedLoc, kind: lexprNodeRef, node: intermediate)
-      let intermediateSource = RExprRef[N](loc: generatedLoc, kind: rexprNodeRef, node: intermediate)
+      let intermediateDest = LExprRef(loc: generatedLoc, kind: lexprNodeRef, node: intermediate)
+      let intermediateSource = RExprRef(loc: generatedLoc, kind: rexprNodeRef, node: intermediate)
       gvn.createAssign(intermediateDest, e)
       gvn.exprCache[hash] = intermediateSource
     e = gvn.exprCache[hash]
 
-proc walk[N](gvn: var GVN[N], s: StmtRef[N]) =
+proc walk(gvn: var GVN, s: StmtRef) =
   case s.kind
   of stmtAssign:
     assert(s.dest.kind == lexprNodeRef, "the l-expressions that should be present at this stage are lexprNodeRefs")
@@ -73,13 +73,13 @@ proc walk[N](gvn: var GVN[N], s: StmtRef[N]) =
 
   gvn.unit.stmts.add(s)
 
-proc runGVN*[N](unit: CompilationUnitRef[N]) =
+proc runGVN*(unit: CompilationUnitRef) =
   let stmts = unit.stmts
   unit.stmts = @[]
 
-  var gvn: GVN[N]
+  var gvn: GVN
   gvn.unit = unit
-  gvn.exprCache = initTable[Hash, RExprRef[N]]()
+  gvn.exprCache = initTable[Hash, RExprRef]()
   gvn.nextIntermediate = 1
 
   for s in stmts:

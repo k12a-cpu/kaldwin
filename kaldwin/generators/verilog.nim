@@ -2,7 +2,7 @@ from tables import pairs
 import ropes
 import kaldwin.types
 
-proc rope(e: LExprRef[string]): Rope =
+proc rope(e: LExprRef): Rope =
   case e.kind
   of lexprNodeRef:
     result = rope(e.node)
@@ -11,7 +11,7 @@ proc rope(e: LExprRef[string]): Rope =
   of lexprSlice:
     assert(false, "lexprSlice should not be present at this stage")
 
-proc rope(e: RExprRef[string]): Rope =
+proc rope(e: RExprRef): Rope =
   case e.kind
   of rexprNodeRef:
     result = rope(e.node)
@@ -41,14 +41,14 @@ proc rope(e: RExprRef[string]): Rope =
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 
-proc rope(s: StmtRef[string]): Rope =
+proc rope(s: StmtRef): Rope =
   case s.kind
   of stmtAssign:
     result = &[rope("assign "), rope(s.dest), rope(" = "), rope(s.source), rope(";\n")]
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_out"): Rope =
+proc rope(unit: CompilationUnitRef, moduleName: string = "kaldwin_out"): Rope =
   result = &[rope("module "), rope(moduleName)]
 
   var portLines: seq[Rope] = @[]
@@ -84,5 +84,5 @@ proc rope(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_out"):
 
   result = &[result, rope("\nendmodule\n")]
 
-proc generateVerilog*(unit: CompilationUnitRef[string], moduleName: string = "kaldwin_out"): string =
+proc generateVerilog*(unit: CompilationUnitRef, moduleName: string = "kaldwin_out"): string =
   $rope(unit, moduleName)

@@ -2,27 +2,27 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 
-proc isZero[N](e: RExprRef[N]): bool {.noSideEffect.} =
+proc isZero(e: RExprRef): bool {.noSideEffect.} =
   e.kind == rexprLiteral and e.literalValue == 0
 
-proc isOne[N](e: RExprRef[N]): bool {.noSideEffect.} =
+proc isOne(e: RExprRef): bool {.noSideEffect.} =
   e.kind == rexprLiteral and e.literalValue == 1
 
-proc isUndefined[N](e: RExprRef[N]): bool {.noSideEffect.} =
+proc isUndefined(e: RExprRef): bool {.noSideEffect.} =
   e.kind == rexprUndefined
 
-proc makeNot[N](a: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
+proc makeNot(a: RExprRef): RExprRef {.noSideEffect.} =
   if a.kind == rexprNot:
     a.notChild
   else:
-    RExprRef[N](
+    RExprRef(
       loc: generatedLoc,
       kind: rexprNot,
       notChild: a,
     )
 
-proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
-  RExprRef[N](
+proc makeAnd(a, b: RExprRef): RExprRef {.noSideEffect.} =
+  RExprRef(
     loc: generatedLoc,
     kind: rexprBinaryOp,
     op: binaryOpAnd,
@@ -30,8 +30,8 @@ proc makeAnd[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
     rightChild: b,
   )
 
-proc makeOr[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
-  RExprRef[N](
+proc makeOr(a, b: RExprRef): RExprRef {.noSideEffect.} =
+  RExprRef(
     loc: generatedLoc,
     kind: rexprBinaryOp,
     op: binaryOpOr,
@@ -39,14 +39,14 @@ proc makeOr[N](a, b: RExprRef[N]): RExprRef[N] {.noSideEffect.} =
     rightChild: b,
   )
 
-proc walk[N](e: var RExprRef[N]) =
-  let zero = RExprRef[N](
+proc walk(e: var RExprRef) =
+  let zero = RExprRef(
     loc: generatedLoc,
     kind: rexprLiteral,
     literalWidth: 1,
     literalValue: 0,
   )
-  let one = RExprRef[N](
+  let one = RExprRef(
     loc: generatedLoc,
     kind: rexprLiteral,
     literalWidth: 1,
@@ -131,16 +131,16 @@ proc walk[N](e: var RExprRef[N]) =
   of rexprSlice:
     walk(e.sliceChild)
 
-proc walk[N](s: StmtRef[N]) =
+proc walk(s: StmtRef) =
   case s.kind
   of stmtAssign:
     walk(s.source)
   of stmtIf:
     assert(false, "stmtIf should not be present at this stage")
 
-proc walk[N](unit: CompilationUnitRef[N]) =
+proc walk(unit: CompilationUnitRef) =
   for s in unit.stmts:
     walk(s)
 
-proc optimiseLogic*[N](unit: CompilationUnitRef[N]) =
+proc optimiseLogic*(unit: CompilationUnitRef) =
   walk(unit)

@@ -48,7 +48,7 @@ proc addBuffer(g: var Generator, q: Wire, a: WireOrLiteral) {.noSideEffect.} =
 proc addNand(g: var Generator, q: Wire, a, b: WireOrLiteral) {.noSideEffect.} =
   g.nands.add((a: a, b: b, q: q))
 
-proc reduce[N](g: var Generator, s: StmtRef[N]) {.noSideEffect.} =
+proc reduce(g: var Generator, s: StmtRef) {.noSideEffect.} =
   assert(s.kind == stmtAssign, "only stmtAssign should be present at this stage")
   assert(s.dest.kind == lexprNodeRef, "only lexprNodeRef should be present at this stage")
 
@@ -90,7 +90,7 @@ proc reduce[N](g: var Generator, s: StmtRef[N]) {.noSideEffect.} =
   of rexprSlice:
     assert(false, "rexprSlice should not be present at this stage")
 
-proc reduce[N](g: var Generator, unit: CompilationUnitRef[N]) {.noSideEffect.} =
+proc reduce(g: var Generator, unit: CompilationUnitRef) {.noSideEffect.} =
   for node in unit.intermediateWidths.keys():
     g.intermediates.add(node)
   for s in unit.stmts:
@@ -187,7 +187,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
 proc rope(g: Generator, namespace: Rope): Rope =
   &[rope(g.intermediates, namespace), rope(g.buffers, namespace), rope(g.nands, namespace)]
 
-proc generateAttano*[N](unit: CompilationUnitRef[N], namespace: string = "kaldwin_out"): string =
+proc generateAttano*(unit: CompilationUnitRef, namespace: string = "kaldwin_out"): string =
   var g: Generator = (intermediates: @[], buffers: @[], nands: @[])
   g.reduce(unit)
   result = $rope(g, rope(namespace))

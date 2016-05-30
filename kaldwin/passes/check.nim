@@ -3,15 +3,15 @@ import tables
 import kaldwin.types
 
 type
-  Checker[N] = tuple
-    unit: CompilationUnitRef[N]
+  Checker = tuple
+    unit: CompilationUnitRef
     messages: seq[string]
 
-proc error[N](c: var Checker[N], loc: Loc, msg: string) {.noSideEffect.} =
+proc error(c: var Checker, loc: Loc, msg: string) {.noSideEffect.} =
   c.messages.add("$1: $2" % [$loc, msg])
 
 # Check the given r-expression, and returns the bit-width of the expression.
-proc walk[N](c: var Checker[N], e: RExprRef[N]): int =
+proc walk(c: var Checker, e: RExprRef): int =
   case e.kind
   of rexprNodeRef:
     if e.node in c.unit.inputWidths:
@@ -81,7 +81,7 @@ proc walk[N](c: var Checker[N], e: RExprRef[N]): int =
   assert result > 0
 
 # Check the given l-expression, and returns the bit-width of the expression.
-proc walk[N](c: var Checker[N], e: LExprRef[N]): int =
+proc walk(c: var Checker, e: LExprRef): int =
   case e.kind
   of lexprNodeRef:
     if e.node in c.unit.intermediateWidths:
@@ -111,7 +111,7 @@ proc walk[N](c: var Checker[N], e: LExprRef[N]): int =
 
   assert result > 0
 
-proc walk[N](c: var Checker[N], s: StmtRef[N]) =
+proc walk(c: var Checker, s: StmtRef) =
   case s.kind
   of stmtAssign:
     let destWidth = c.walk(s.dest)
@@ -127,14 +127,14 @@ proc walk[N](c: var Checker[N], s: StmtRef[N]) =
     for child in s.ifElseChildren:
       c.walk(child)
 
-proc walk[N](c: var Checker[N]) =
+proc walk(c: var Checker) =
   for s in c.unit.stmts:
     c.walk(s)
 
-proc check*[N](unit: CompilationUnitRef[N]): seq[string] =
-  var c: Checker[N] = (
+proc check*(unit: CompilationUnitRef): seq[string] =
+  var c: Checker = Checker((
     unit: unit,
-    messages: @[],
-  )
+    messages: newSeq[string](),
+  ))
   c.walk()
   result = c.messages

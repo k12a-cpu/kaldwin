@@ -13,10 +13,10 @@ type
 var currentFilename: string
 var currentLineno {.header: "lexer_gen.h", importc: "kaldwin_yylineno".}: int
 
-var unit: CompilationUnitRef[string]
-var stmtStack: seq[StmtRef[string]] = @[]
-var lexprStack: seq[LExprRef[string]] = @[]
-var rexprStack: seq[RExprRef[string]] = @[]
+var unit: CompilationUnitRef
+var stmtStack: seq[StmtRef] = @[]
+var lexprStack: seq[LExprRef] = @[]
+var rexprStack: seq[RExprRef] = @[]
 
 proc reset() =
   unit.new()
@@ -51,7 +51,7 @@ proc finish(numStatements: uint64) {.cdecl, exportc: "kaldwin_yy_finish".} =
 proc constructStmtAssignment() {.cdecl, exportc: "kaldwin_yy_construct_stmt_assignment".} =
   let source = rexprStack.pop()
   let dest = lexprStack.pop()
-  stmtStack.add(StmtRef[string](
+  stmtStack.add(StmtRef(
     loc: currentLoc(),
     kind: stmtAssign,
     source: source,
@@ -62,7 +62,7 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
   let elseChildren = stmtStack.popn(int(numElseChildren))
   let thenChildren = stmtStack.popn(int(numThenChildren))
   let condition = rexprStack.pop()
-  stmtStack.add(StmtRef[string](
+  stmtStack.add(StmtRef(
     loc: currentLoc(),
     kind: stmtIf,
     ifCondition: condition,
@@ -78,7 +78,7 @@ proc addOutput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_ou
 
 proc constructLExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_slice".} =
   let child = lexprStack.pop()
-  lexprStack.add(LExprRef[string](
+  lexprStack.add(LExprRef(
     loc: currentLoc(),
     kind: lexprSlice,
     sliceUpperBound: int(upperBound),
@@ -87,7 +87,7 @@ proc constructLExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kald
   ))
 
 proc constructLExprNodeRef(name: cstring) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_noderef".} =
-  lexprStack.add(LExprRef[string](
+  lexprStack.add(LExprRef(
     loc: currentLoc(),
     kind: lexprNodeRef,
     node: $name,
@@ -95,7 +95,7 @@ proc constructLExprNodeRef(name: cstring) {.cdecl, exportc: "kaldwin_yy_construc
 
 proc constructLExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_concat".} =
   let children = lexprStack.popn(int(numChildren))
-  lexprStack.add(LExprRef[string](
+  lexprStack.add(LExprRef(
     loc: currentLoc(),
     kind: lexprConcat,
     concatChildren: children,
@@ -103,7 +103,7 @@ proc constructLExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_con
 
 proc constructRExprNot() {.cdecl, exportc: "kaldwin_yy_construct_rexpr_not".} =
   let child = rexprStack.pop()
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprNot,
     notChild: child,
@@ -111,7 +111,7 @@ proc constructRExprNot() {.cdecl, exportc: "kaldwin_yy_construct_rexpr_not".} =
 
 proc constructRExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_slice".} =
   let child = rexprStack.pop()
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprSlice,
     sliceUpperBound: int(upperBound),
@@ -128,7 +128,7 @@ proc constructRExprBinaryOp(opChar: char) {.cdecl, exportc: "kaldwin_yy_construc
     of '|': binaryOpOr
     of '^': binaryOpXor
     else:   unreachable[BinaryOp]()
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprBinaryOp,
     op: op,
@@ -137,14 +137,14 @@ proc constructRExprBinaryOp(opChar: char) {.cdecl, exportc: "kaldwin_yy_construc
   ))
 
 proc constructRExprNodeRef(name: cstring) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_noderef".} =
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprNodeRef,
     node: $name,
   ))
 
 proc constructRExprLiteral(width: uint64, value: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_literal".} =
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprLiteral,
     literalWidth: int(width),
@@ -153,7 +153,7 @@ proc constructRExprLiteral(width: uint64, value: uint64) {.cdecl, exportc: "kald
 
 proc constructRExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_concat".} =
   let children = rexprStack.popn(int(numChildren))
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprConcat,
     concatChildren: children,
@@ -161,7 +161,7 @@ proc constructRExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_con
 
 proc constructRExprMultiply(count: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_multiply".} =
   let child = rexprStack.pop()
-  rexprStack.add(RExprRef[string](
+  rexprStack.add(RExprRef(
     loc: currentLoc(),
     kind: rexprMultiply,
     multiplyCount: int(count),
@@ -171,14 +171,14 @@ proc constructRExprMultiply(count: uint64) {.cdecl, exportc: "kaldwin_yy_constru
 proc parseStdinInternal() {.cdecl, header: "parser.h", importc: "kaldwin_parse_stdin".}
 proc parseFileInternal(filename: cstring) {.cdecl, header: "parser.h", importc: "kaldwin_parse_file".}
 
-proc parseStdin*(): CompilationUnitRef[string] =
+proc parseStdin*(): CompilationUnitRef =
   reset()
   currentFilename = "<stdin>"
   parseStdinInternal()
   result = unit
   reset()
 
-proc parseFile*(filename: string): CompilationUnitRef[string] =
+proc parseFile*(filename: string): CompilationUnitRef =
   reset()
   currentFilename = filename
   parseFileInternal(filename)

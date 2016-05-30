@@ -10,7 +10,7 @@ proc getOrDefault[A, B](t: Table[A, B], key: A, defaultValue: B): B =
   else:
     defaultValue
 
-proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, RExprRef[N]]) =
+proc walk(s: StmtRef, unit: CompilationUnitRef, context: var Table[string, RExprRef]) =
   case s.kind
   of stmtAssign:
     assert(s.dest.kind == lexprNodeRef)
@@ -26,7 +26,7 @@ proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, R
       walk(child, unit, elseContext)
 
     # Enumerate all output nodes in the two contexts.
-    var outputNodeSet: HashSet[N]
+    var outputNodeSet: HashSet[string]
     outputNodeSet.init()
     for node in thenContext.keys():
       outputNodeSet.incl(node)
@@ -35,7 +35,7 @@ proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, R
 
     # For each output node, create a multiplexer between the two possible values coming from the two branches.
     for outputNode in outputNodeSet.items():
-      let undefined = RExprRef[N](
+      let undefined = RExprRef(
         loc: generatedLoc,
         kind: rexprUndefined,
         undefinedWidth: unit.outputWidths[outputNode],
@@ -45,7 +45,7 @@ proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, R
       if thenExpr == elseExpr:
         context[outputNode] = thenExpr
       else:
-        context[outputNode] = RExprRef[N](
+        context[outputNode] = RExprRef(
           loc: generatedLoc,
           kind: rexprMux,
           muxCondition: s.ifCondition,
@@ -53,18 +53,18 @@ proc walk[N](s: StmtRef[N], unit: CompilationUnitRef[N], context: var Table[N, R
           muxElse: elseExpr,
         )
 
-proc flattenBranches*[N](unit: CompilationUnitRef[N]) =
-  var context = initTable[N, RExprRef[N]]()
+proc flattenBranches*(unit: CompilationUnitRef) =
+  var context = initTable[string, RExprRef]()
   for s in unit.stmts:
     walk(s, unit, context)
 
   unit.stmts = @[]
   for node, e in context.pairs():
-    unit.stmts.add(StmtRef[N](
+    unit.stmts.add(StmtRef(
       loc: generatedLoc,
       kind: stmtAssign,
       source: e,
-      dest: LExprRef[N](
+      dest: LExprRef(
         loc: generatedLoc,
         kind: lexprNodeRef,
         node: node,

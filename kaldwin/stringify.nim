@@ -16,7 +16,7 @@ proc rope*(op: BinaryOp): Rope =
   of binaryOpXor:
     rope("^")
 
-proc rope*[N](e: LExprRef[N]): Rope =
+proc rope*(e: LExprRef): Rope =
   case e.kind
   of lexprNodeRef:
     result = rope(e.node)
@@ -37,7 +37,7 @@ proc rope*[N](e: LExprRef[N]): Rope =
       rope("]"),
     ]
 
-proc rope*[N](e: RExprRef[N]): Rope =
+proc rope*(e: RExprRef): Rope =
   case e.kind
   of rexprNodeRef:
     result = rope(e.node)
@@ -102,7 +102,7 @@ proc rope*[N](e: RExprRef[N]): Rope =
       rope("]"),
     ]
 
-proc rope*[N](s: StmtRef[N], indent: Rope = nil): Rope =
+proc rope*(s: StmtRef, indent: Rope = nil): Rope =
   case s.kind
   of stmtAssign:
     result = &[
@@ -126,7 +126,7 @@ proc rope*[N](s: StmtRef[N], indent: Rope = nil): Rope =
     else:
       result = &[result, rope("\n")]
 
-proc rope*[N](unit: CompilationUnitRef[N]): Rope =
+proc rope*(unit: CompilationUnitRef): Rope =
   for node, width in unit.inputWidths.pairs():
     result = &[result, rope("input "), rope(node)]
     if width != 1:
@@ -154,5 +154,5 @@ proc rope*[N](unit: CompilationUnitRef[N]): Rope =
   for s in unit.stmts:
     result = result & rope(s)
 
-proc `$`*[N](unit: CompilationUnitRef[N]): string =
+proc `$`*(unit: CompilationUnitRef): string =
   $rope(unit)
