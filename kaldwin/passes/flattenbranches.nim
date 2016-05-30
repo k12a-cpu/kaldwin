@@ -4,13 +4,13 @@ import kaldwin.types
 
 const generatedLoc: Loc = (filename: "<generated in flattenBranches>", lineno: 0)
 
-proc getOrDefault[A, B](t: Table[A, B], key: A, defaultValue: B): B =
+proc getOrDefault[A, B](t: OrderedTable[A, B], key: A, defaultValue: B): B =
   if key in t:
     t[key]
   else:
     defaultValue
 
-proc walk(s: StmtRef, unit: CompilationUnitRef, context: var Table[string, RExprRef]) =
+proc walk(s: StmtRef, unit: CompilationUnitRef, context: var OrderedTable[string, RExprRef]) =
   case s.kind
   of stmtAssign:
     assert(s.dest.kind == lexprNodeRef)
@@ -54,7 +54,7 @@ proc walk(s: StmtRef, unit: CompilationUnitRef, context: var Table[string, RExpr
         )
 
 proc flattenBranches*(unit: CompilationUnitRef) =
-  var context = initTable[string, RExprRef]()
+  var context = initOrderedTable[string, RExprRef]()
   for s in unit.stmts:
     walk(s, unit, context)
 
