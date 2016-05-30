@@ -94,6 +94,7 @@ proc walk(c: var Checker, e: LExprRef): int =
         c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       else:
         c.error(e.loc, "undefined reference to node")
+      result = 1 # fallback
 
   of lexprConcat:
     for child in e.concatChildren:
