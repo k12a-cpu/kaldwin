@@ -153,6 +153,3 @@ proc hash*[N](s: StmtRef[N]): Hash {.noSideEffect.} =
     result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) !& hash(s.ifElseChildren)
 
   result = !$result
-
-proc hash*[N](unit: CompilationUnitRef[N]): Hash {.noSideEffect.} =
-  result = !$(result !& hash(unit.inputWidths) !& hash(unit.intermediateWidths) !& hash(unit.outputWidths) !& hash(unit.stmts))
