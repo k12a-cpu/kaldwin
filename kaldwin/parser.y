@@ -114,24 +114,24 @@ rexprs
     ;
 
 rexpr
-    : '~' rexpr                                 { kaldwin_yy_construct_rexpr_not(); }
-    | rexpr_noprefix
-    ;
-
-rexpr_noprefix
-    : rexpr '[' INT ']'                         { kaldwin_yy_construct_rexpr_slice($3, $3); }
-    | rexpr '[' INT ':' INT ']'                 { kaldwin_yy_construct_rexpr_slice($3, $5); }
-    | rexpr_nosuffix
-    ;
-
-rexpr_nosuffix
-    : rexpr_nosuffix '&' rexpr_atom             { kaldwin_yy_construct_rexpr_binaryop('&'); }
-    | rexpr_nosuffix '|' rexpr_atom             { kaldwin_yy_construct_rexpr_binaryop('|'); }
-    | rexpr_nosuffix '^' rexpr_atom             { kaldwin_yy_construct_rexpr_binaryop('^'); }
+    : rexpr '&' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('&'); }
+    | rexpr '|' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('|'); }
+    | rexpr '^' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('^'); }
     | rexpr_atom
     ;
 
 rexpr_atom
+    : '~' rexpr_atom                            { kaldwin_yy_construct_rexpr_not(); }
+    | rexpr_noprefix
+    ;
+
+rexpr_noprefix
+    : rexpr_noprefix '[' INT ']'                { kaldwin_yy_construct_rexpr_slice($3, $3); }
+    | rexpr_noprefix '[' INT ':' INT ']'        { kaldwin_yy_construct_rexpr_slice($3, $5); }
+    | rexpr_nosuffix
+    ;
+
+rexpr_nosuffix
     : IDENT                                     { kaldwin_yy_construct_rexpr_noderef($1); }
     | SIZED_INT                                 { kaldwin_yy_construct_rexpr_literal($1.width, $1.value); }
     | '{' rexprs_comma '}'                      { kaldwin_yy_construct_rexpr_concat($2); }
