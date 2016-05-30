@@ -150,7 +150,7 @@ proc hash*[N](s: StmtRef[N]): Hash {.noSideEffect.} =
   of stmtAssign:
     result = result !& hash(s.source) !& hash(s.dest)
   of stmtIf:
-    result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) & hash(s.ifElseChildren)
+    result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) !& hash(s.ifElseChildren)
 
   result = !$result
 
