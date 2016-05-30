@@ -4,7 +4,7 @@ import kaldwin.types
 
 type
   Checker[N] = tuple
-    unit: CompilationUnitRef[N] not nil
+    unit: CompilationUnitRef[N]
     messages: seq[string]
 
 proc error[N](c: var Checker[N], loc: Loc, msg: string) {.noSideEffect.} =
