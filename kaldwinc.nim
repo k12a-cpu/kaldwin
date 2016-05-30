@@ -2,6 +2,7 @@ import docopt
 import kaldwin.parse
 import kaldwin.stringify
 import kaldwin.passes.check
+import kaldwin.passes.flattennodes
 import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
 import kaldwin.passes.nandify
@@ -23,8 +24,8 @@ Options:
                                       [default: kaldwin_out]
   -d <stage>, --dump <stage>          Halt and dump intermediate representation
                                       after <stage>, where <stage> is one of
-                                      'check', 'flatten', 'opt1', 'nand', 'opt2'
-                                      or 'gvn'.
+                                      'check', 'fn', 'fb', 'opt1', 'nand',
+                                      'opt2' or 'gvn'.
 """
 
 let args = docopt(doc)
@@ -52,8 +53,13 @@ if dump == "check":
   echo $unit
   quit(0)
 
+flattenNodes(unit)
+if dump == "fn":
+  echo $unit
+  quit(0)
+
 flattenBranches(unit)
-if dump == "flatten":
+if dump == "fb":
   echo $unit
   quit(0)
 
