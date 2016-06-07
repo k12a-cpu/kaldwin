@@ -144,7 +144,7 @@ proc rope(nands: seq[Nand], namespace: Rope): Rope =
 
     result = &[
       result,
-      rope("create "),
+      rope("instance "),
       namespace,
       rope("_nand"),
       rope(i),
