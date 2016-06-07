@@ -21,10 +21,7 @@ proc walk(c: var Checker, e: RExprRef): int =
     elif e.node in c.unit.outputWidths:
       result = c.unit.outputWidths[e.node]
     else:
-      when compiles($e.node):
-        c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
-      else:
-        c.error(e.loc, "undefined reference to node")
+      c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       result = 1 # fallback
 
   of rexprLiteral:
@@ -90,10 +87,7 @@ proc walk(c: var Checker, e: LExprRef): int =
     elif e.node in c.unit.outputWidths:
       result = c.unit.outputWidths[e.node]
     else:
-      when compiles($e.node):
-        c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
-      else:
-        c.error(e.loc, "undefined reference to node")
+      c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       result = 1 # fallback
 
   of lexprConcat:
