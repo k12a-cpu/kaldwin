@@ -1,6 +1,7 @@
+import tables
 from os import parentDir
 from strutils import `%`
-import tables
+
 import types
 
 {.compile: "lexer_gen.c".}

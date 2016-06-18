@@ -1,7 +1,8 @@
+import ropes
 from strutils import startsWith
 from tables import keys
-import ropes
-import "../types"
+
+import ../types
 
 type
   Wire = string

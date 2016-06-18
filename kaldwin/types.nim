@@ -1,6 +1,6 @@
-from strutils import `%`
 import hashes
 import tables
+from strutils import `%`
 
 type
   Loc* = tuple

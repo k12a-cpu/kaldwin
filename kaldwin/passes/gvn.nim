@@ -1,8 +1,8 @@
 # Global-value numbering
 
-import hashes
-import tables
-import "../types"
+import hashes, tables
+
+import ../types
 
 const generatedLoc: Loc = (filename: "<generated in gvn>", lineno: 0)
 

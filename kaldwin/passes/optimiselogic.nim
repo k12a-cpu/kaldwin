@@ -1,4 +1,4 @@
-import "../types"
+import ../types
 
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 

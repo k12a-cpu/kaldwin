@@ -1,6 +1,6 @@
-import sets
-import tables
-import "../types"
+import sets, tables
+
+import ../types
 
 const generatedLoc: Loc = (filename: "<generated in flattenBranches>", lineno: 0)
 

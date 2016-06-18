@@ -1,6 +1,7 @@
-from tables import pairs
 import ropes
-import "../types"
+from tables import pairs
+
+import ../types
 
 proc rope(e: LExprRef): Rope =
   case e.kind

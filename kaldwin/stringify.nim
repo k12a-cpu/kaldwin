@@ -1,5 +1,6 @@
-from tables import len, pairs
 import ropes
+from tables import len, pairs
+
 import types
 
 proc rope*(loc: Loc): Rope =

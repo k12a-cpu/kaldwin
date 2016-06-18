@@ -1,6 +1,7 @@
-from sequtils import cycle
 import tables
-import "../types"
+from sequtils import cycle
+
+import ../types
 
 proc unreachable[T](): T =
   assert(false, "unreachable")
