@@ -1,6 +1,6 @@
 from tables import len, pairs
 import ropes
-import kaldwin.types
+import types
 
 proc rope*(loc: Loc): Rope =
   rope($loc)

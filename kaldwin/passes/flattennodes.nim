@@ -1,6 +1,6 @@
 from sequtils import cycle
 import tables
-import kaldwin.types
+import "../types"
 
 proc unreachable[T](): T =
   assert(false, "unreachable")

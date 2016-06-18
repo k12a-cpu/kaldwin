@@ -2,7 +2,7 @@
 
 import hashes
 import tables
-import kaldwin.types
+import "../types"
 
 const generatedLoc: Loc = (filename: "<generated in gvn>", lineno: 0)
 

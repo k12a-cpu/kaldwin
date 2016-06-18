@@ -1,7 +1,7 @@
 from strutils import startsWith
 from tables import keys
 import ropes
-import kaldwin.types
+import "../types"
 
 type
   Wire = string

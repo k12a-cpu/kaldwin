@@ -1,6 +1,6 @@
 from strutils import `%`
 import tables
-import kaldwin.types
+import "../types"
 
 type
   Checker = tuple

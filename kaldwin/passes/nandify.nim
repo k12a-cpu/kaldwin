@@ -1,4 +1,4 @@
-import kaldwin.types
+import "../types"
 
 const generatedLoc: Loc = (filename: "<generated in nandify>", lineno: 0)
 

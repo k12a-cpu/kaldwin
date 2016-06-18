@@ -1,6 +1,6 @@
 from tables import pairs
 import ropes
-import kaldwin.types
+import "../types"
 
 proc rope(e: LExprRef): Rope =
   case e.kind

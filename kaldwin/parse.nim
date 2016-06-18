@@ -1,7 +1,7 @@
 from os import parentDir
 from strutils import `%`
 import tables
-import kaldwin.types
+import types
 
 {.compile: "lexer_gen.c".}
 {.compile: "parser_gen.c".}
