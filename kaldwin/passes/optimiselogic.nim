@@ -61,6 +61,10 @@ proc walk(e: var RExprRef) =
     walk(e.notChild)
     if e.notChild.kind == rexprNot: # double-not chain
       e = e.notChild.notChild
+    elif e.notChild.isZero():
+      e = one
+    elif e.notChild.isOne():
+      e = zero
 
   of rexprBinaryOp:
     walk(e.leftChild)
