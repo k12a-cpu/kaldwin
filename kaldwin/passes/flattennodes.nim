@@ -36,7 +36,7 @@ proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
     result = @[]
     for i in countdown(e.concatChildren.len()-1, 0):
       result.add(flatten(e.concatChildren[i], unit))
-  
+
   of lexprSlice:
     let bitExprs = flatten(e.sliceChild, unit)
     result = bitExprs[e.sliceLowerBound .. e.sliceUpperBound]
@@ -90,7 +90,7 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
     result.newSeq(e.undefinedWidth)
     for i in 0 .. e.undefinedWidth-1:
       result[i] = undef
-  
+
   of rexprNot:
     result = flatten(e.notChild, unit)
     for bitExpr in result.mitems():
@@ -99,7 +99,7 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
         kind: rexprNot,
         notChild: bitExpr,
       )
-  
+
   of rexprBinaryOp:
     case e.op
     of binaryOpNand, binaryOpAnd, binaryOpOr, binaryOpXor:
@@ -155,7 +155,7 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
     let conditionBitExprs = flatten(e.muxCondition, unit)
     assert(conditionBitExprs.len() == 1)
     let conditionBitExpr = conditionBitExprs[0]
-    
+
     let thenBitExprs = flatten(e.muxThen, unit)
     let elseBitExprs = flatten(e.muxElse, unit)
     assert(thenBitExprs.len() == elseBitExprs.len())
@@ -168,15 +168,15 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
         muxThen: thenBitExprs[i],
         muxElse: elseBitExprs[i],
       )
-  
+
   of rexprConcat:
     result = @[]
     for i in countdown(e.concatChildren.len()-1, 0):
       result.add(flatten(e.concatChildren[i], unit))
-  
+
   of rexprMultiply:
     result = cycle(flatten(e.multiplyChild, unit), e.multiplyCount)
-  
+
   of rexprSlice:
     let bitExprs = flatten(e.sliceChild, unit)
     result = bitExprs[e.sliceLowerBound .. e.sliceUpperBound]
@@ -196,7 +196,7 @@ proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
         source: sourceBits[i],
         dest: destBits[i],
       ))
-  
+
   of stmtIf:
     let conditionBitExprs = flatten(s.ifCondition, unit)
     assert(conditionBitExprs.len() == 1)
@@ -213,7 +213,7 @@ proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef) =
 
 proc flattenNodes*(unit: CompilationUnitRef) =
   walk(unit.stmts, unit)
-  
+
   var newInputWidths = initTable[string, int]()
   var newIntermediateWidths = initTable[string, int]()
   var newOutputWidths = initTable[string, int]()
@@ -226,7 +226,7 @@ proc flattenNodes*(unit: CompilationUnitRef) =
   for node, width in unit.outputWidths:
     for i in 0 .. width-1:
       newOutputWidths[nodeBit(node, i, width)] = 1
-  
+
   unit.inputWidths = newInputWidths
   unit.intermediateWidths = newIntermediateWidths
   unit.outputWidths = newOutputWidths
