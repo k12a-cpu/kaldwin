@@ -144,6 +144,8 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
     let bitExprs = flatten(e.sliceChild, unit)
     result = bitExprs[e.sliceLowerBound .. e.sliceUpperBound]
 
+proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef)
+
 proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
   case s.kind
   of stmtAssign:
@@ -159,7 +161,12 @@ proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
       ))
   
   of stmtIf:
-    discard
+    let conditionBitExprs = flatten(s.ifCondition, unit)
+    assert(conditionBitExprs.len() == 1)
+    s.ifCondition = conditionBitExprs[0]
+    walk(s.ifThenChildren, unit)
+    walk(s.ifElseChildren, unit)
+    newStmts.add(s)
 
 proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef) =
   var newStmts: seq[StmtRef] = @[]
