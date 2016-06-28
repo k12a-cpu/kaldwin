@@ -30,7 +30,7 @@
 %token <str> IDENT
 %token <sized_int> SIZED_INT
 
-%type <u64> statements_opt statements lexprs_comma lexprs rexprs_comma rexprs
+%type <u64> statements_opt statements else_content lexprs_comma lexprs rexprs_comma rexprs
 
 %%
 
@@ -79,7 +79,12 @@ assignment
 if
     : IF rexpr '{' statements_opt '}'           { kaldwin_yy_construct_stmt_if($4, 0); }
     | IF rexpr '{' statements_opt '}'
-      ELSE '{' statements_opt '}'               { kaldwin_yy_construct_stmt_if($4, $8); }
+      ELSE else_content                         { kaldwin_yy_construct_stmt_if($4, $7); }
+    ;
+
+else_content
+    : '{' statements_opt '}'                    { $$ = $2; }
+    | if                                        { $$ = 1; }
     ;
 
 lexprs_comma
