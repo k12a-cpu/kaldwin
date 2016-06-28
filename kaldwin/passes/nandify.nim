@@ -43,6 +43,10 @@ proc walk(e: var RExprRef) =
       e = makeNand(makeNot(e.leftChild), makeNot(e.rightChild))
     of binaryOpXor:
       e = xorToNand(e.leftChild, e.rightChild)
+    of binaryOpEq:
+      e = makeNot(xorToNand(e.leftChild, e.rightChild))
+    of binaryOpNe:
+      e = xorToNand(e.leftChild, e.rightChild)
   of rexprMux:
     walk(e.muxCondition)
     walk(e.muxThen)

@@ -3,10 +3,10 @@ import ../types
 const generatedLoc: Loc = (filename: "<generated in optimiseLogic>", lineno: 0)
 
 proc isZero(e: RExprRef): bool {.noSideEffect.} =
-  e.kind == rexprLiteral and e.literalValue == 0
+  e.kind == rexprLiteral and e.literalWidth == 1 and e.literalValue == 0
 
 proc isOne(e: RExprRef): bool {.noSideEffect.} =
-  e.kind == rexprLiteral and e.literalValue == 1
+  e.kind == rexprLiteral and e.literalWidth == 1 and e.literalValue == 1
 
 proc isUndefined(e: RExprRef): bool {.noSideEffect.} =
   e.kind == rexprUndefined
@@ -96,6 +96,15 @@ proc walk(e: var RExprRef) =
         e = makeNot(e.rightChild)
       elif e.rightChild.isOne():
         e = makeNot(e.leftChild)
+    of binaryOpEq, binaryOpNe:
+      if e.leftChild.isZero():
+        e = makeNot(e.rightChild)
+      elif e.leftChild.isOne():
+        e = e.rightChild
+      elif e.rightChild.isZero():
+        e = makeNot(e.leftChild)
+      elif e.rightChild.isOne():
+        e = e.leftChild
 
   of rexprMux:
     walk(e.muxCondition)

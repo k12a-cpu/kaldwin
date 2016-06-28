@@ -45,7 +45,12 @@ proc walk(c: var Checker, e: RExprRef): int =
     let rightWidth = c.walk(e.rightChild)
     if leftWidth != rightWidth:
       c.error(e.loc, "left and right operands have different widths ($1 and $2)" % [$leftWidth, $rightWidth])
-    result = leftWidth
+    result =
+      case e.op
+      of binaryOpNand, binaryOpAnd, binaryOpOr, binaryOpXor:
+        leftWidth
+      of binaryOpEq, binaryOpNe:
+        1
 
   of rexprMux:
     let condWidth = c.walk(e.muxCondition)

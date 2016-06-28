@@ -23,6 +23,8 @@ if                      { return IF; }
 input                   { return INPUT; }
 intermediate            { return INTERMEDIATE; }
 output                  { return OUTPUT; }
+"=="                    { return EQ; }
+"!="                    { return NE; }
 
 [0-9]+\'b[01]+          { char *endptr;
                           kaldwin_yylval.sized_int.width = (uint64_t) strtol(kaldwin_yytext, &endptr, 10);

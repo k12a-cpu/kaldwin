@@ -131,6 +131,8 @@ proc constructRExprBinaryOp(opChar: char) {.cdecl, exportc: "kaldwin_yy_construc
     of '&': binaryOpAnd
     of '|': binaryOpOr
     of '^': binaryOpXor
+    of '=': binaryOpEq
+    of '!': binaryOpNe
     else:   unreachable[BinaryOp]()
   rexprStack.add(RExprRef(
     loc: currentLoc(),

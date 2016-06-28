@@ -24,6 +24,8 @@
 %token INPUT
 %token INTERMEDIATE
 %token OUTPUT
+%token EQ
+%token NE
 %token <u64> INT
 %token <str> IDENT
 %token <sized_int> SIZED_INT
@@ -120,6 +122,8 @@ rexpr
     : rexpr '&' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('&'); }
     | rexpr '|' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('|'); }
     | rexpr '^' rexpr_atom                      { kaldwin_yy_construct_rexpr_binaryop('^'); }
+    | rexpr EQ rexpr_atom                       { kaldwin_yy_construct_rexpr_binaryop('='); }
+    | rexpr NE rexpr_atom                       { kaldwin_yy_construct_rexpr_binaryop('!'); }
     | rexpr_atom
     ;
 

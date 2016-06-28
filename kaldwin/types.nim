@@ -12,6 +12,8 @@ type
     binaryOpAnd
     binaryOpOr
     binaryOpXor
+    binaryOpEq
+    binaryOpNe
 
   LExprKind* = enum
     lexprNodeRef

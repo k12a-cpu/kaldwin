@@ -330,7 +330,7 @@ extern int kaldwin_yylex (void);
 #undef YY_DECL
 #endif
 
-#line 52 "kaldwin/lexer.l"
+#line 54 "kaldwin/lexer.l"
 
 
 #line 337 "kaldwin/lexer_gen.h"

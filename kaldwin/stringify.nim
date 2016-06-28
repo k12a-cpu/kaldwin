@@ -16,6 +16,10 @@ proc rope*(op: BinaryOp): Rope =
     rope("|")
   of binaryOpXor:
     rope("^")
+  of binaryOpEq:
+    rope("==")
+  of binaryOpNe:
+    rope("!=")
 
 proc rope*(e: LExprRef): Rope =
   case e.kind

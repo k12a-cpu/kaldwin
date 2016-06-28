@@ -101,19 +101,56 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
       )
   
   of rexprBinaryOp:
-    let leftBitExprs = flatten(e.leftChild, unit)
-    let rightBitExprs = flatten(e.rightChild, unit)
-    assert(leftBitExprs.len() == rightBitExprs.len())
-    result.newSeq(leftBitExprs.len())
-    for i in 0 .. result.len()-1:
-      result[i] = RExprRef(
-        loc: e.loc,
-        kind: rexprBinaryOp,
-        op: e.op,
-        leftChild: leftBitExprs[i],
-        rightChild: rightBitExprs[i],
-      )
-  
+    case e.op
+    of binaryOpNand, binaryOpAnd, binaryOpOr, binaryOpXor:
+      let leftBitExprs = flatten(e.leftChild, unit)
+      let rightBitExprs = flatten(e.rightChild, unit)
+      assert(leftBitExprs.len() == rightBitExprs.len())
+      result.newSeq(leftBitExprs.len())
+      for i in 0 .. result.len()-1:
+        result[i] = RExprRef(
+          loc: e.loc,
+          kind: rexprBinaryOp,
+          op: e.op,
+          leftChild: leftBitExprs[i],
+          rightChild: rightBitExprs[i],
+        )
+
+    of binaryOpEq, binaryOpNe:
+      let leftBitExprs = flatten(e.leftChild, unit)
+      let rightBitExprs = flatten(e.rightChild, unit)
+      assert(leftBitExprs.len() == rightBitExprs.len())
+      var resultExpr =
+        RExprRef(
+          loc: e.loc,
+          kind: rexprBinaryOp,
+          op: binaryOpEq,
+          leftChild: leftBitExprs[0],
+          rightChild: rightBitExprs[0],
+        )
+      for i in 1 .. leftBitExprs.len()-1:
+        resultExpr =
+          RExprRef(
+            loc: e.loc,
+            kind: rexprBinaryOp,
+            op: binaryOpAnd,
+            leftChild: resultExpr,
+            rightChild: RExprRef(
+              loc: e.loc,
+              kind: rexprBinaryOp,
+              op: binaryOpEq,
+              leftChild: leftBitExprs[i],
+              rightChild: rightBitExprs[i],
+            ),
+          )
+      if e.op == binaryOpNe:
+        resultExpr = RExprRef(
+          loc: e.loc,
+          kind: rexprNot,
+          notChild: resultExpr,
+        )
+      result = @[resultExpr]
+
   of rexprMux:
     let conditionBitExprs = flatten(e.muxCondition, unit)
     assert(conditionBitExprs.len() == 1)
