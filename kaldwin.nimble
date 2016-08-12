@@ -8,5 +8,5 @@ bin           = @["kaldwinc"]
 
 # Dependencies
 
-requires "nim >= 0.13.0"
+requires "nim >= 0.14.0"
 requires "docopt >= 0.6"
