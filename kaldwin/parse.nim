@@ -21,9 +21,7 @@ var rexprStack: seq[RExprRef] = @[]
 
 proc reset() =
   unit.new()
-  unit.inputWidths = initTable[string, int]()
-  unit.intermediateWidths = initTable[string, int]()
-  unit.outputWidths = initTable[string, int]()
+  unit.nodes = initTable[string, Node]()
   stmtStack.setLen(0)
   lexprStack.setLen(0)
   rexprStack.setLen(0)
@@ -71,14 +69,14 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
     ifElseChildren: elseChildren,
   ))
 
-proc addInput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_input".} =
-  unit.inputWidths[$name] = int(bits)
-
-proc addIntermediate(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_intermediate".} =
-  unit.intermediateWidths[$name] = int(bits)
-
-proc addOutput(name: cstring, bits: uint64) {.cdecl, exportc: "kaldwin_yy_add_output".} =
-  unit.outputWidths[$name] = int(bits)
+proc addNode(name: cstring, bits, extern, transient: uint64) {.cdecl, exportc: "kaldwin_yy_add_node".} =
+  let node = Node(
+    name: $name,
+    width: int(bits),
+    extern: extern != 0u64,
+    transient: transient != 0u64,
+  )
+  unit.nodes[node.name] = node
 
 proc constructLExprSlice(upperBound, lowerBound: uint64) {.cdecl, exportc: "kaldwin_yy_construct_lexpr_slice".} =
   let child = lexprStack.pop()

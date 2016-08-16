@@ -15,12 +15,8 @@ proc error(c: var Checker, loc: Loc, msg: string) {.noSideEffect.} =
 proc walk(c: var Checker, e: RExprRef): int =
   case e.kind
   of rexprNodeRef:
-    if e.node in c.unit.inputWidths:
-      result = c.unit.inputWidths[e.node]
-    elif e.node in c.unit.intermediateWidths:
-      result = c.unit.intermediateWidths[e.node]
-    elif e.node in c.unit.outputWidths:
-      result = c.unit.outputWidths[e.node]
+    if e.node in c.unit.nodes:
+      result = c.unit.nodes[e.node].width
     else:
       c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       result = 1 # fallback
@@ -47,7 +43,7 @@ proc walk(c: var Checker, e: RExprRef): int =
       c.error(e.loc, "left and right operands have different widths ($1 and $2)" % [$leftWidth, $rightWidth])
     result =
       case e.op
-      of binaryOpNand, binaryOpAnd, binaryOpOr, binaryOpXor:
+      of binaryOpAnd, binaryOpOr, binaryOpXor:
         leftWidth
       of binaryOpEq, binaryOpNe:
         1
@@ -88,10 +84,8 @@ proc walk(c: var Checker, e: RExprRef): int =
 proc walk(c: var Checker, e: LExprRef): int =
   case e.kind
   of lexprNodeRef:
-    if e.node in c.unit.intermediateWidths:
-      result = c.unit.intermediateWidths[e.node]
-    elif e.node in c.unit.outputWidths:
-      result = c.unit.outputWidths[e.node]
+    if e.node in c.unit.nodes:
+      result = c.unit.nodes[e.node].width
     else:
       c.error(e.loc, "undefined reference to node '$1'" % [$e.node])
       result = 1 # fallback

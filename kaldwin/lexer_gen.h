@@ -13,7 +13,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 0
+#define YY_FLEX_SUBMINOR_VERSION 1
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -92,25 +92,13 @@ typedef unsigned int flex_uint32_t;
 
 #endif /* ! FLEXINT_H */
 
-#ifdef __cplusplus
-
-/* The "const" storage-class-modifier is valid. */
-#define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
+/* TODO: this is always defined, so inline it */
 #define yyconst const
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define yynoreturn __attribute__((__noreturn__))
 #else
-#define yyconst
+#define yynoreturn
 #endif
 
 /* Size of default input buffer. */
@@ -136,7 +124,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-extern yy_size_t kaldwin_yyleng;
+extern int kaldwin_yyleng;
 
 extern FILE *kaldwin_yyin, *kaldwin_yyout;
 
@@ -152,12 +140,12 @@ struct yy_buffer_state
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
 	 */
-	yy_size_t yy_buf_size;
+	int yy_buf_size;
 
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -201,7 +189,7 @@ void kaldwin_yypop_buffer_state (void );
 
 YY_BUFFER_STATE kaldwin_yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE kaldwin_yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE kaldwin_yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
+YY_BUFFER_STATE kaldwin_yy_scan_bytes (yyconst char *bytes,int len  );
 
 void *kaldwin_yyalloc (yy_size_t  );
 void *kaldwin_yyrealloc (void *,yy_size_t  );
@@ -258,7 +246,7 @@ FILE *kaldwin_yyget_out (void );
 
 void kaldwin_yyset_out  (FILE * _out_str  );
 
-yy_size_t kaldwin_yyget_leng (void );
+			int kaldwin_yyget_leng (void );
 
 char *kaldwin_yyget_text (void );
 
@@ -333,6 +321,6 @@ extern int kaldwin_yylex (void);
 #line 54 "kaldwin/lexer.l"
 
 
-#line 337 "kaldwin/lexer_gen.h"
+#line 325 "kaldwin/lexer_gen.h"
 #undef kaldwin_yyIN_HEADER
 #endif /* kaldwin_yyHEADER_H */

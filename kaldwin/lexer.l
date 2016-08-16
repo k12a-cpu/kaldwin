@@ -19,10 +19,10 @@
 [\(\)\[\]\{\}=:;,~&\|\^x]  { return kaldwin_yytext[0]; }
 
 else                    { return ELSE; }
+extern                  { return EXTERN; }
 if                      { return IF; }
-input                   { return INPUT; }
-intermediate            { return INTERMEDIATE; }
-output                  { return OUTPUT; }
+node                    { return NODE; }
+transient               { return TRANSIENT; }
 "=="                    { return EQ; }
 "!="                    { return NE; }
 

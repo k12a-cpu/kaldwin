@@ -5,9 +5,7 @@ import kaldwin.passes.check
 import kaldwin.passes.flattennodes
 import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
-import kaldwin.passes.nandify
-import kaldwin.passes.gvn
-import kaldwin.generators.attano
+# import kaldwin.generators.attano
 
 const doc = """
 kaldwinc - Compiler for the Kaldwin logic specification language.
@@ -68,24 +66,24 @@ if dump == "opt1":
   echo $unit
   quit(0)
 
-nandify(unit)
-if dump == "nand":
-  echo $unit
-  quit(0)
+# nandify(unit)
+# if dump == "nand":
+#   echo $unit
+#   quit(0)
 
-optimiseLogic(unit)
-if dump == "opt2":
-  echo $unit
-  quit(0)
+# optimiseLogic(unit)
+# if dump == "opt2":
+#   echo $unit
+#   quit(0)
 
-runGVN(unit)
-if dump == "gvn":
-  echo $unit
-  quit(0)
+# runGVN(unit)
+# if dump == "gvn":
+#   echo $unit
+#   quit(0)
 
-let output = generateAttano(unit, namespace = $args["--prefix"])
+# let output = generateAttano(unit, namespace = $args["--prefix"])
 
-if args["--output"]:
-  writeFile($args["--output"], output)
-else:
-  echo output
+# if args["--output"]:
+#   writeFile($args["--output"], output)
+# else:
+#   echo output

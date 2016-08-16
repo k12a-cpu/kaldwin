@@ -70,13 +70,6 @@ proc walk(e: var RExprRef) =
     walk(e.leftChild)
     walk(e.rightChild)
     case e.op
-    of binaryOpNand:
-      if e.leftChild.isZero() or e.rightChild.isZero():
-        e = one
-      elif e.leftChild.isOne():
-        e = makeNot(e.rightChild)
-      elif e.rightChild.isOne():
-        e = makeNot(e.leftChild)
     of binaryOpAnd:
       if e.leftChild.isZero() or e.rightChild.isZero():
         e = zero

@@ -20,41 +20,47 @@
 }
 
 %token ELSE
+%token EXTERN
 %token IF
-%token INPUT
-%token INTERMEDIATE
-%token OUTPUT
+%token NODE
+%token TRANSIENT
 %token EQ
 %token NE
 %token <u64> INT
 %token <str> IDENT
 %token <sized_int> SIZED_INT
 
-%type <u64> statements_opt statements else_content lexprs_comma lexprs rexprs_comma rexprs
+%type <u64> extern transient statements_opt statements else_content lexprs_comma lexprs rexprs_comma rexprs
 
 %%
 
 compilation_unit
-    : ports_opt statements_opt                  { kaldwin_yy_finish($2); }
+    : nodes_opt statements_opt                  { kaldwin_yy_finish($2); }
     ;
 
-ports_opt
-    : ports
+nodes_opt
+    : nodes
     |
     ;
 
-ports
-    : ports port
-    | port
+nodes
+    : nodes node
+    | node
     ;
 
-port
-    : INPUT IDENT ';'                           { kaldwin_yy_add_input($2, 1); }
-    | INPUT IDENT '[' INT ']' ';'               { kaldwin_yy_add_input($2, $4); }
-    | INTERMEDIATE IDENT ';'                    { kaldwin_yy_add_intermediate($2, 1); }
-    | INTERMEDIATE IDENT '[' INT ']' ';'        { kaldwin_yy_add_intermediate($2, $4); }
-    | OUTPUT IDENT ';'                          { kaldwin_yy_add_output($2, 1); }
-    | OUTPUT IDENT '[' INT ']' ';'              { kaldwin_yy_add_output($2, $4); }
+node
+    : extern transient NODE IDENT ';'             { kaldwin_yy_add_node($4, 1, $1, $2); }
+    | extern transient NODE IDENT '[' INT ']' ';' { kaldwin_yy_add_node($4, $6, $1, $2); }
+    ;
+
+extern
+    : EXTERN                                    { $$ = 1; }
+    |                                           { $$ = 0; }
+    ;
+
+transient
+    : TRANSIENT                                 { $$ = 1; }
+    |                                           { $$ = 0; }
     ;
 
 statements_opt

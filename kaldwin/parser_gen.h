@@ -54,10 +54,10 @@ extern int kaldwin_yydebug;
   enum kaldwin_yytokentype
   {
     ELSE = 258,
-    IF = 259,
-    INPUT = 260,
-    INTERMEDIATE = 261,
-    OUTPUT = 262,
+    EXTERN = 259,
+    IF = 260,
+    NODE = 261,
+    TRANSIENT = 262,
     EQ = 263,
     NE = 264,
     INT = 265,

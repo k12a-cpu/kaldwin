@@ -28,7 +28,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 0
+#define YY_FLEX_SUBMINOR_VERSION 1
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -107,25 +107,13 @@ typedef unsigned int flex_uint32_t;
 
 #endif /* ! FLEXINT_H */
 
-#ifdef __cplusplus
-
-/* The "const" storage-class-modifier is valid. */
-#define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
+/* TODO: this is always defined, so inline it */
 #define yyconst const
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define yynoreturn __attribute__((__noreturn__))
 #else
-#define yyconst
+#define yynoreturn
 #endif
 
 /* Returned upon end-of-file. */
@@ -186,7 +174,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-extern yy_size_t kaldwin_yyleng;
+extern int kaldwin_yyleng;
 
 extern FILE *kaldwin_yyin, *kaldwin_yyout;
 
@@ -244,12 +232,12 @@ struct yy_buffer_state
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
 	 */
-	yy_size_t yy_buf_size;
+	int yy_buf_size;
 
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -300,7 +288,7 @@ struct yy_buffer_state
 /* Stack of input buffers. */
 static size_t yy_buffer_stack_top = 0; /**< index of top of stack. */
 static size_t yy_buffer_stack_max = 0; /**< capacity of stack. */
-static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
+static YY_BUFFER_STATE * yy_buffer_stack = NULL; /**< Stack as an array. */
 
 /* We provide macros for accessing buffer states in case in the
  * future we want to put the buffer states in a more general
@@ -319,11 +307,11 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when kaldwin_yytext is formed. */
 static char yy_hold_char;
-static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t kaldwin_yyleng;
+static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+int kaldwin_yyleng;
 
 /* Points to current character in buffer. */
-static char *yy_c_buf_p = (char *) 0;
+static char *yy_c_buf_p = NULL;
 static int yy_init = 0;		/* whether we need to initialize */
 static int yy_start = 0;	/* start state number */
 
@@ -348,7 +336,7 @@ static void kaldwin_yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE kaldwin_yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE kaldwin_yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE kaldwin_yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
+YY_BUFFER_STATE kaldwin_yy_scan_bytes (yyconst char *bytes,int len  );
 
 void *kaldwin_yyalloc (yy_size_t  );
 void *kaldwin_yyrealloc (void *,yy_size_t  );
@@ -385,7 +373,7 @@ void kaldwin_yyfree (void *  );
 
 typedef unsigned char YY_CHAR;
 
-FILE *kaldwin_yyin = (FILE *) 0, *kaldwin_yyout = (FILE *) 0;
+FILE *kaldwin_yyin = NULL, *kaldwin_yyout = NULL;
 
 typedef int yy_state_type;
 
@@ -402,17 +390,14 @@ extern char *kaldwin_yytext;
 static yy_state_type yy_get_previous_state (void );
 static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );
 static int yy_get_next_buffer (void );
-#if defined(__GNUC__) && __GNUC__ >= 3
-__attribute__((__noreturn__))
-#endif
-static void yy_fatal_error (yyconst char msg[]  );
+static void yynoreturn yy_fatal_error (yyconst char* msg  );
 
 /* Done after the current pattern has been matched and before the
  * corresponding action - sets up kaldwin_yytext.
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	kaldwin_yyleng = (size_t) (yy_cp - yy_bp); \
+	kaldwin_yyleng = (int) (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
@@ -426,14 +411,14 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[54] =
+static yyconst flex_int16_t yy_accept[52] =
     {   0,
         0,    0,   18,   16,    1,    1,   16,   16,    3,   14,
-        3,   15,   15,   15,   15,    3,   10,    0,    2,    0,
-       14,    9,   15,   15,    5,   15,   15,    0,    0,    0,
-       15,   15,   15,   15,   11,   12,   13,    4,   15,   15,
-       15,    6,   15,   15,   15,    8,   15,   15,   15,   15,
-       15,    7,    0
+        3,   15,   15,   15,   15,   15,    3,   10,    0,    2,
+        0,   14,    9,   15,   15,   15,    6,   15,   15,    0,
+        0,    0,   15,   15,   15,   15,   11,   12,   13,    4,
+       15,    7,   15,   15,   15,    5,   15,   15,   15,    8,
+        0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -449,8 +434,8 @@ static yyconst YY_CHAR yy_ec[256] =
        12,   12,   12,   12,   12,   12,   12,   12,   12,   12,
         6,    1,    6,    6,   12,    1,   13,   14,   11,   15,
 
-       16,   17,   12,   18,   19,   12,   12,   20,   21,   22,
-       23,   24,   12,   25,   26,   27,   28,   12,   12,   29,
+       16,   17,   12,   18,   19,   12,   12,   20,   12,   21,
+       22,   12,   12,   23,   24,   25,   12,   12,   12,   26,
        12,   12,    6,    6,    6,    6,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -468,63 +453,61 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst YY_CHAR yy_meta[30] =
+static yyconst YY_CHAR yy_meta[27] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    2,    2,    1,
         2,    3,    2,    2,    2,    2,    2,    3,    3,    3,
-        3,    3,    3,    3,    3,    3,    3,    3,    3
+        3,    3,    3,    3,    3,    3
     } ;
 
-static yyconst flex_uint16_t yy_base[57] =
+static yyconst flex_uint16_t yy_base[55] =
     {   0,
-        0,    0,   78,   79,   79,   79,   67,   73,   79,   23,
-       65,    0,   54,   16,   45,    0,   79,   69,   79,   21,
-       33,   79,    0,   45,    0,   10,   43,   61,   35,    0,
-       52,   39,   50,   41,   56,   37,    0,    0,   36,   37,
-       33,    0,   39,   32,   42,    0,   42,   37,   42,   27,
-       37,    0,   79,   46,   48,   50
+        0,    0,   72,   73,   73,   73,   61,   67,   73,   20,
+       59,    0,   10,   51,   45,   43,    0,   73,   62,   73,
+       17,   30,   73,    0,   40,   38,    0,   47,   48,   52,
+       25,    0,   43,   42,   41,   35,   47,   32,    0,    0,
+       31,    0,   29,   31,   32,    0,   34,   28,   23,    0,
+       73,   41,   43,   45
     } ;
 
-static yyconst flex_int16_t yy_def[57] =
+static yyconst flex_int16_t yy_def[55] =
     {   0,
-       53,    1,   53,   53,   53,   53,   53,   54,   53,   53,
-       53,   55,   55,   55,   55,   55,   53,   54,   53,   53,
-       53,   53,   55,   55,   55,   55,   55,   53,   53,   56,
-       55,   55,   55,   55,   53,   53,   56,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55,   55,    0,   53,   53,   53
+       51,    1,   51,   51,   51,   51,   51,   52,   51,   51,
+       51,   53,   53,   53,   53,   53,   53,   51,   52,   51,
+       51,   51,   51,   53,   53,   53,   53,   53,   53,   51,
+       51,   54,   53,   53,   53,   53,   51,   51,   54,   53,
+       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
+        0,   51,   51,   51
     } ;
 
-static yyconst flex_uint16_t yy_nxt[109] =
+static yyconst flex_uint16_t yy_nxt[100] =
     {   0,
         4,    5,    6,    7,    8,    9,    4,   10,   10,   11,
        12,   12,   12,   12,   12,   13,   12,   12,   14,   12,
-       12,   12,   15,   12,   12,   12,   12,   12,   16,   20,
-       21,   21,   25,   32,   28,   29,   33,   26,   30,   20,
-       21,   21,   36,   36,   36,   36,   18,   18,   18,   23,
-       23,   37,   52,   51,   50,   49,   48,   47,   46,   45,
-       44,   43,   42,   35,   41,   40,   39,   38,   35,   34,
-       31,   19,   27,   24,   22,   19,   17,   53,    3,   53,
-       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
-       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
+       15,   12,   12,   12,   16,   17,   21,   22,   22,   25,
+       30,   31,   38,   38,   32,   26,   21,   22,   22,   38,
+       38,   19,   19,   19,   24,   24,   39,   50,   49,   48,
+       47,   46,   45,   44,   37,   43,   42,   41,   40,   37,
+       36,   35,   34,   33,   20,   29,   28,   27,   23,   20,
+       18,   51,    3,   51,   51,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,   51
 
-       53,   53,   53,   53,   53,   53,   53,   53
     } ;
 
-static yyconst flex_int16_t yy_chk[109] =
+static yyconst flex_int16_t yy_chk[100] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,   10,
-       10,   10,   14,   26,   20,   20,   26,   14,   20,   21,
-       21,   21,   29,   29,   36,   36,   54,   54,   54,   55,
-       55,   56,   51,   50,   49,   48,   47,   45,   44,   43,
-       41,   40,   39,   35,   34,   33,   32,   31,   28,   27,
-       24,   18,   15,   13,   11,    8,    7,    3,   53,   53,
-       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
-       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
+        1,    1,    1,    1,    1,    1,   10,   10,   10,   13,
+       21,   21,   31,   31,   21,   13,   22,   22,   22,   38,
+       38,   52,   52,   52,   53,   53,   54,   49,   48,   47,
+       45,   44,   43,   41,   37,   36,   35,   34,   33,   30,
+       29,   28,   26,   25,   19,   16,   15,   14,   11,    8,
+        7,    3,   51,   51,   51,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,   51
 
-       53,   53,   53,   53,   53,   53,   53,   53
     } ;
 
 /* Table of booleans, true if rule could match eol. */
@@ -554,7 +537,7 @@ char *kaldwin_yytext;
 
 #include "parser_gen.h"
 
-#line 558 "kaldwin/lexer_gen.c"
+#line 541 "kaldwin/lexer_gen.c"
 
 #define INITIAL 0
 
@@ -593,7 +576,7 @@ FILE *kaldwin_yyget_out (void );
 
 void kaldwin_yyset_out  (FILE * _out_str  );
 
-yy_size_t kaldwin_yyget_leng (void );
+			int kaldwin_yyget_leng (void );
 
 char *kaldwin_yyget_text (void );
 
@@ -652,7 +635,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO do { if (fwrite( kaldwin_yytext, kaldwin_yyleng, 1, kaldwin_yyout )) {} } while (0)
+#define ECHO do { if (fwrite( kaldwin_yytext, (size_t) kaldwin_yyleng, 1, kaldwin_yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -676,7 +659,7 @@ static int input (void );
 	else \
 		{ \
 		errno=0; \
-		while ( (result = fread(buf, 1, max_size, kaldwin_yyin))==0 && ferror(kaldwin_yyin)) \
+		while ( (result = (int) fread(buf, 1, max_size, kaldwin_yyin))==0 && ferror(kaldwin_yyin)) \
 			{ \
 			if( errno != EINTR) \
 				{ \
@@ -775,7 +758,7 @@ YY_DECL
 #line 14 "kaldwin/lexer.l"
 
 
-#line 779 "kaldwin/lexer_gen.c"
+#line 762 "kaldwin/lexer_gen.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -802,13 +785,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 54 )
+				if ( yy_current_state >= 52 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
-			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			yy_current_state = yy_nxt[yy_base[yy_current_state] + (flex_int16_t) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 79 );
+		while ( yy_base[yy_current_state] != 73 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -867,22 +850,22 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 22 "kaldwin/lexer.l"
-{ return IF; }
+{ return EXTERN; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 23 "kaldwin/lexer.l"
-{ return INPUT; }
+{ return IF; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 24 "kaldwin/lexer.l"
-{ return INTERMEDIATE; }
+{ return NODE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 25 "kaldwin/lexer.l"
-{ return OUTPUT; }
+{ return TRANSIENT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
@@ -942,7 +925,7 @@ YY_RULE_SETUP
 #line 54 "kaldwin/lexer.l"
 ECHO;
 	YY_BREAK
-#line 946 "kaldwin/lexer_gen.c"
+#line 929 "kaldwin/lexer_gen.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1129,7 +1112,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -1143,7 +1126,7 @@ static int yy_get_next_buffer (void)
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1156,7 +1139,7 @@ static int yy_get_next_buffer (void)
 				}
 			else
 				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = 0;
+				b->yy_ch_buf = NULL;
 
 			if ( ! b->yy_ch_buf )
 				YY_FATAL_ERROR(
@@ -1198,9 +1181,9 @@ static int yy_get_next_buffer (void)
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((yy_size_t) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) kaldwin_yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -1235,10 +1218,10 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 54 )
+			if ( yy_current_state >= 52 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		yy_current_state = yy_nxt[yy_base[yy_current_state] + (flex_int16_t) yy_c];
 		}
 
 	return yy_current_state;
@@ -1263,11 +1246,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 54 )
+		if ( yy_current_state >= 52 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
-	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 53);
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + (flex_int16_t) yy_c];
+	yy_is_jam = (yy_current_state == 51);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1286,7 +1269,7 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		yy_size_t number_to_move = (yy_n_chars) + 2;
+		int number_to_move = (yy_n_chars) + 2;
 		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		char *source =
@@ -1298,7 +1281,7 @@ static int yy_get_next_buffer (void)
 		yy_cp += (int) (dest - source);
 		yy_bp += (int) (dest - source);
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
+			(yy_n_chars) = (int) YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
 
 		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 			YY_FATAL_ERROR( "flex scanner push-back overflow" );
@@ -1341,7 +1324,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -1365,7 +1348,7 @@ static int yy_get_next_buffer (void)
 				case EOB_ACT_END_OF_FILE:
 					{
 					if ( kaldwin_yywrap( ) )
-						return EOF;
+						return 0;
 
 					if ( ! (yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
@@ -1618,7 +1601,7 @@ void kaldwin_yypop_buffer_state (void)
  */
 static void kaldwin_yyensure_buffer_stack (void)
 {
-	yy_size_t num_to_alloc;
+	int num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -1673,7 +1656,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_buffer  (char * base, yy_size_t  size )
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
 		/* They forgot to leave room for the EOB's. */
-		return 0;
+		return NULL;
 
 	b = (YY_BUFFER_STATE) kaldwin_yyalloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
@@ -1682,7 +1665,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_buffer  (char * base, yy_size_t  size )
 	b->yy_buf_size = size - 2;	/* "- 2" to take care of EOB's */
 	b->yy_buf_pos = b->yy_ch_buf = base;
 	b->yy_is_our_buffer = 0;
-	b->yy_input_file = 0;
+	b->yy_input_file = NULL;
 	b->yy_n_chars = b->yy_buf_size;
 	b->yy_is_interactive = 0;
 	b->yy_at_bol = 1;
@@ -1705,7 +1688,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_buffer  (char * base, yy_size_t  size )
 YY_BUFFER_STATE kaldwin_yy_scan_string (yyconst char * yystr )
 {
     
-	return kaldwin_yy_scan_bytes(yystr,strlen(yystr) );
+	return kaldwin_yy_scan_bytes(yystr,(int) strlen(yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to kaldwin_yylex() will
@@ -1715,7 +1698,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE kaldwin_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE kaldwin_yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
@@ -1723,7 +1706,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yyby
 	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
-	n = _yybytes_len + 2;
+	n = (yy_size_t) _yybytes_len + 2;
 	buf = (char *) kaldwin_yyalloc(n  );
 	if ( ! buf )
 		YY_FATAL_ERROR( "out of dynamic memory in kaldwin_yy_scan_bytes()" );
@@ -1749,7 +1732,7 @@ YY_BUFFER_STATE kaldwin_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yyby
 #define YY_EXIT_FAILURE 2
 #endif
 
-static void yy_fatal_error (yyconst char* msg )
+static void yynoreturn yy_fatal_error (yyconst char* msg )
 {
 			(void) fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
@@ -1802,7 +1785,7 @@ FILE *kaldwin_yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-yy_size_t kaldwin_yyget_leng  (void)
+int kaldwin_yyget_leng  (void)
 {
         return kaldwin_yyleng;
 }
@@ -1861,10 +1844,10 @@ static int yy_init_globals (void)
     /* We do not touch kaldwin_yylineno unless the option is enabled. */
     kaldwin_yylineno =  1;
     
-    (yy_buffer_stack) = 0;
+    (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
-    (yy_c_buf_p) = (char *) 0;
+    (yy_c_buf_p) = NULL;
     (yy_init) = 0;
     (yy_start) = 0;
 
@@ -1873,8 +1856,8 @@ static int yy_init_globals (void)
     kaldwin_yyin = stdin;
     kaldwin_yyout = stdout;
 #else
-    kaldwin_yyin = (FILE *) 0;
-    kaldwin_yyout = (FILE *) 0;
+    kaldwin_yyin = NULL;
+    kaldwin_yyout = NULL;
 #endif
 
     /* For future reference: Set errno on error, since we are called by
@@ -1932,7 +1915,7 @@ static int yy_flex_strlen (yyconst char * s )
 
 void *kaldwin_yyalloc (yy_size_t  size )
 {
-			return (void *) malloc( size );
+			return malloc(size);
 }
 
 void *kaldwin_yyrealloc  (void * ptr, yy_size_t  size )
@@ -1945,7 +1928,7 @@ void *kaldwin_yyrealloc  (void * ptr, yy_size_t  size )
 	 * any pointer type to void*, and deal with argument conversions
 	 * as though doing an assignment.
 	 */
-	return (void *) realloc( (char *) ptr, size );
+	return realloc(ptr, size);
 }
 
 void kaldwin_yyfree (void * ptr )

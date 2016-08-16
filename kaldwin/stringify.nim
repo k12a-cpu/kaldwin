@@ -1,5 +1,5 @@
 import ropes
-from tables import len, pairs
+from tables import len, values
 
 import types
 
@@ -8,8 +8,6 @@ proc rope*(loc: Loc): Rope =
 
 proc rope*(op: BinaryOp): Rope =
   case op
-  of binaryOpNand:
-    rope("~&")
   of binaryOpAnd:
     rope("&")
   of binaryOpOr:
@@ -132,28 +130,16 @@ proc rope*(s: StmtRef, indent: Rope = nil): Rope =
       result = &[result, rope("\n")]
 
 proc rope*(unit: CompilationUnitRef): Rope =
-  for node, width in unit.inputWidths.pairs():
-    result = &[result, rope("input "), rope(node)]
-    if width != 1:
-      result = &[result, rope("["), rope(width), rope("]")]
+  for node in unit.nodes.values:
+    if node.extern:
+      result = &[result, rope("extern ")]
+    if node.transient:
+      result = &[result, rope("transient ")]
+    result = &[result, rope("node "), rope(node.name)]
+    if node.width != 1:
+      result = &[result, rope("["), rope(node.width), rope("]")]
     result = &[result, rope(";\n")]
-  if len(unit.inputWidths) > 0:
-    result = result & rope("\n")
-
-  for node, width in unit.intermediateWidths.pairs():
-    result = &[result, rope("intermediate "), rope(node)]
-    if width != 1:
-      result = &[result, rope("["), rope(width), rope("]")]
-    result = &[result, rope(";\n")]
-  if len(unit.outputWidths) > 0:
-    result = result & rope("\n")
-
-  for node, width in unit.outputWidths.pairs():
-    result = &[result, rope("output "), rope(node)]
-    if width != 1:
-      result = &[result, rope("["), rope(width), rope("]")]
-    result = &[result, rope(";\n")]
-  if len(unit.outputWidths) > 0:
+  if len(unit.nodes) > 0:
     result = result & rope("\n")
 
   for s in unit.stmts:

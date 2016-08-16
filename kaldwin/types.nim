@@ -8,7 +8,6 @@ type
     lineno: int
 
   BinaryOp* = enum
-    binaryOpNand
     binaryOpAnd
     binaryOpOr
     binaryOpXor
@@ -94,10 +93,14 @@ type
 
   StmtRef* = ref Stmt
 
+  Node* = object
+    name*: string
+    width*: int
+    extern*: bool # declared elsewhere in the attano corpus, so no 'node' statement needs to be generated
+    transient*: bool # not used outside of this file, so can be optimised away
+
   CompilationUnit* = object
-    inputWidths*: Table[string, int]
-    intermediateWidths*: Table[string, int]
-    outputWidths*: Table[string, int]
+    nodes*: Table[string, Node]
     stmts*: seq[ref Stmt]
 
   CompilationUnitRef* = ref CompilationUnit

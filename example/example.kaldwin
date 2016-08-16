@@ -1,13 +1,13 @@
-input spi_begin;
-input spi_counter_zero;
-input spi_data_io_store;
-input spi_sck;
-input spi_state;
+node spi_begin;
+node spi_counter_zero;
+node spi_data_io_store;
+node spi_sck;
+node spi_state;
 
-output spi_counter_tick;
-output spi_data_sel;
-output spi_data_store;
-output spi_next_state;
+node spi_counter_tick;
+node spi_data_sel;
+node spi_data_store;
+extern node spi_next_state;
 
 spi_counter_tick = 1'h0;
 spi_data_store = 1'h0;

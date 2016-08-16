@@ -3,38 +3,23 @@ from sequtils import cycle
 
 import ../types
 
-proc unreachable[T](): T =
-  assert(false, "unreachable")
-
-proc nodeBit(node: string, bit: int, width: int): string =
-  if width == 1:
-    node
-  else:
-    node & "__bit" & $bit
-
 proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
   case e.kind
   of lexprNodeRef:
-    let width =
-      if e.node in unit.inputWidths:
-        unit.inputWidths[e.node]
-      elif e.node in unit.intermediateWidths:
-        unit.intermediateWidths[e.node]
-      elif e.node in unit.outputWidths:
-        unit.outputWidths[e.node]
-      else:
-        unreachable[int]()
+    let width = unit.nodes[e.node].width
     result.newSeq(width)
     for i in 0 .. width-1:
       result[i] = LExprRef(
         loc: e.loc,
-        kind: lexprNodeRef,
-        node: nodeBit(e.node, i, width),
+        kind: lexprSlice,
+        sliceUpperBound: i,
+        sliceLowerBound: i,
+        sliceChild: e,
       )
 
   of lexprConcat:
     result = @[]
-    for i in countdown(e.concatChildren.len()-1, 0):
+    for i in countdown(e.concatChildren.high, e.concatChildren.low):
       result.add(flatten(e.concatChildren[i], unit))
 
   of lexprSlice:
@@ -44,52 +29,35 @@ proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
 proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
   case e.kind
   of rexprNodeRef:
-    let width =
-      if e.node in unit.inputWidths:
-        unit.inputWidths[e.node]
-      elif e.node in unit.intermediateWidths:
-        unit.intermediateWidths[e.node]
-      elif e.node in unit.outputWidths:
-        unit.outputWidths[e.node]
-      else:
-        unreachable[int]()
+    let width = unit.nodes[e.node].width
     result.newSeq(width)
     for i in 0 .. width-1:
       result[i] = RExprRef(
         loc: e.loc,
-        kind: rexprNodeRef,
-        node: nodeBit(e.node, i, width),
+        kind: rexprSlice,
+        sliceUpperBound: i,
+        sliceLowerBound: i,
+        sliceChild: e,
       )
 
   of rexprLiteral:
-    let zero = RExprRef(
-      loc: e.loc,
-      kind: rexprLiteral,
-      literalWidth: 1,
-      literalValue: 0,
-    )
-    let one = RExprRef(
-      loc: e.loc,
-      kind: rexprLiteral,
-      literalWidth: 1,
-      literalValue: 1,
-    )
     result.newSeq(e.literalWidth)
     for i in 0 .. e.literalWidth-1:
-      if (e.literalValue and (1 shl i)) != 0:
-        result[i] = one
-      else:
-        result[i] = zero
+      result[i] = RExprRef(
+        loc: e.loc,
+        kind: rexprLiteral,
+        literalWidth: 1,
+        literalValue: (e.literalValue shr i) and 1,
+      )
 
   of rexprUndefined:
-    let undef = RExprRef(
-      loc: e.loc,
-      kind: rexprUndefined,
-      undefinedWidth: 1,
-    )
     result.newSeq(e.undefinedWidth)
     for i in 0 .. e.undefinedWidth-1:
-      result[i] = undef
+      result[i] = RExprRef(
+        loc: e.loc,
+        kind: rexprUndefined,
+        undefinedWidth: 1,
+      )
 
   of rexprNot:
     result = flatten(e.notChild, unit)
@@ -102,7 +70,7 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
 
   of rexprBinaryOp:
     case e.op
-    of binaryOpNand, binaryOpAnd, binaryOpOr, binaryOpXor:
+    of binaryOpAnd, binaryOpOr, binaryOpXor:
       let leftBitExprs = flatten(e.leftChild, unit)
       let rightBitExprs = flatten(e.rightChild, unit)
       assert(leftBitExprs.len() == rightBitExprs.len())
@@ -213,20 +181,3 @@ proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef) =
 
 proc flattenNodes*(unit: CompilationUnitRef) =
   walk(unit.stmts, unit)
-
-  var newInputWidths = initTable[string, int]()
-  var newIntermediateWidths = initTable[string, int]()
-  var newOutputWidths = initTable[string, int]()
-  for node, width in unit.inputWidths:
-    for i in 0 .. width-1:
-      newInputWidths[nodeBit(node, i, width)] = 1
-  for node, width in unit.intermediateWidths:
-    for i in 0 .. width-1:
-      newIntermediateWidths[nodeBit(node, i, width)] = 1
-  for node, width in unit.outputWidths:
-    for i in 0 .. width-1:
-      newOutputWidths[nodeBit(node, i, width)] = 1
-
-  unit.inputWidths = newInputWidths
-  unit.intermediateWidths = newIntermediateWidths
-  unit.outputWidths = newOutputWidths
