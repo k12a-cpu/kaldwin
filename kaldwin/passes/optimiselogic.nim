@@ -77,6 +77,8 @@ proc walk(e: var RExprRef) =
         e = e.rightChild
       elif e.rightChild.isOne():
         e = e.leftChild
+      elif e.leftChild.kind == rexprNot and e.rightChild.kind == rexprNot:
+        e = makeNot(makeOr(e.leftChild.notChild, e.rightChild.notChild))
     of binaryOpOr:
       if e.leftChild.isOne() or e.rightChild.isOne():
         e = one
@@ -84,6 +86,8 @@ proc walk(e: var RExprRef) =
         e = e.rightChild
       elif e.rightChild.isZero():
         e = e.leftChild
+      elif e.leftChild.kind == rexprNot and e.rightChild.kind == rexprNot:
+        e = makeNot(makeAnd(e.leftChild.notChild, e.rightChild.notChild))
     of binaryOpXor:
       if e.leftChild.isZero():
         e = e.rightChild
