@@ -24,6 +24,21 @@ proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
     let bitExprs = flatten(e.sliceChild, unit)
     result = bitExprs[e.sliceLowerBound .. e.sliceUpperBound]
 
+proc reduce(exprs: seq[RExprRef], op: BinaryOp): RExprRef =
+  if exprs.len == 1:
+    result = exprs[0]
+  else:
+    let pivot = exprs.len div 2
+    let left = reduce(exprs[0 .. pivot-1], op)
+    let right = reduce(exprs[pivot .. exprs.len-1], op)
+    result = RExprRef(
+      loc: left.loc,
+      kind: rexprBinaryOp,
+      op: op,
+      leftChild: left,
+      rightChild: right
+    )
+
 proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
   case e.kind
   of rexprNodeRef:
@@ -86,29 +101,16 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
       let leftBitExprs = flatten(e.leftChild, unit)
       let rightBitExprs = flatten(e.rightChild, unit)
       assert(leftBitExprs.len() == rightBitExprs.len())
-      var resultExpr =
-        RExprRef(
+      var bitExprsToReduce = newSeq[RExprRef](leftBitExprs.len)
+      for i in 0 .. leftBitExprs.len-1:
+        bitExprsToReduce[i] = RExprRef(
           loc: e.loc,
           kind: rexprBinaryOp,
           op: binaryOpEq,
-          leftChild: leftBitExprs[0],
-          rightChild: rightBitExprs[0],
+          leftChild: leftBitExprs[i],
+          rightChild: rightBitExprs[i],
         )
-      for i in 1 .. leftBitExprs.len()-1:
-        resultExpr =
-          RExprRef(
-            loc: e.loc,
-            kind: rexprBinaryOp,
-            op: binaryOpAnd,
-            leftChild: resultExpr,
-            rightChild: RExprRef(
-              loc: e.loc,
-              kind: rexprBinaryOp,
-              op: binaryOpEq,
-              leftChild: leftBitExprs[i],
-              rightChild: rightBitExprs[i],
-            ),
-          )
+      var resultExpr = reduce(bitExprsToReduce, binaryOpAnd)
       if e.op == binaryOpNe:
         resultExpr = RExprRef(
           loc: e.loc,
