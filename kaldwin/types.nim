@@ -92,7 +92,7 @@ type
 
   StmtRef* = ref Stmt
 
-  Node* = object
+  NodeInfo* = object
     loc*: Loc
     name*: string
     width*: int
@@ -100,7 +100,7 @@ type
     transient*: bool # not used outside of this file, so can be optimised away
 
   CompilationUnit* = object
-    nodes*: Table[string, Node]
+    nodes*: Table[string, NodeInfo]
     stmts*: seq[ref Stmt]
 
   CompilationUnitRef* = ref CompilationUnit

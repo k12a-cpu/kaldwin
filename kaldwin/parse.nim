@@ -19,7 +19,7 @@ var rexprStack: seq[RExprRef] = @[]
 
 proc reset() =
   unit.new()
-  unit.nodes = initTable[string, Node]()
+  unit.nodes = initTable[string, NodeInfo]()
   stmtStack.setLen(0)
   lexprStack.setLen(0)
   rexprStack.setLen(0)
@@ -68,7 +68,7 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
   ))
 
 proc addNode(name: cstring, bits, extern, transient: uint64) {.cdecl, exportc: "kaldwin_yy_add_node".} =
-  let node = Node(
+  let node = NodeInfo(
     loc: currentLoc(),
     name: $name,
     width: int(bits),
