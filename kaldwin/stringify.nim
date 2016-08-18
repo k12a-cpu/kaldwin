@@ -1,7 +1,5 @@
-import ropes
+import ropes, types
 from tables import len, values
-
-import types
 
 proc rope*(loc: Loc): Rope =
   rope($loc)

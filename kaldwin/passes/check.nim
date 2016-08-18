@@ -1,7 +1,5 @@
-import tables
+import tables, ../types
 from strutils import `%`
-
-import ../types
 
 type
   Checker = tuple

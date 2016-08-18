@@ -1,5 +1,4 @@
-import hashes
-import tables
+import hashes, tables
 from strutils import `%`
 
 type

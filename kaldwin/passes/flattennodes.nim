@@ -1,7 +1,5 @@
-import tables
+import tables, ../types
 from sequtils import cycle
-
-import ../types
 
 proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
   case e.kind
