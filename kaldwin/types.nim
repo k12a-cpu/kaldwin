@@ -93,6 +93,7 @@ type
   StmtRef* = ref Stmt
 
   Node* = object
+    loc*: Loc
     name*: string
     width*: int
     extern*: bool # declared elsewhere in the attano corpus, so no 'node' statement needs to be generated

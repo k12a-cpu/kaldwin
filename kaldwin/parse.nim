@@ -69,6 +69,7 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
 
 proc addNode(name: cstring, bits, extern, transient: uint64) {.cdecl, exportc: "kaldwin_yy_add_node".} =
   let node = Node(
+    loc: currentLoc(),
     name: $name,
     width: int(bits),
     extern: extern != 0u64,
