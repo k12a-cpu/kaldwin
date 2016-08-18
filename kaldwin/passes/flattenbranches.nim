@@ -12,7 +12,6 @@ type
   Context = OrderedTable[ContextKey, RExprRef]
 
 include dereference
-include cleantransients
 
 proc getOrDefault[A, B](t: OrderedTable[A, B], key: A, defaultValue: B): B =
   try:
@@ -72,7 +71,6 @@ proc flattenBranches*(unit: CompilationUnitRef) =
     walk(s, unit, context)
 
   dereference(context)
-  cleanTransients(context, unit)
 
   unit.stmts = @[]
   for key, e in context.pairs():
