@@ -235,7 +235,8 @@ proc walk(m: var Mapper, e: RExprRef): Wire =
     assert e.literalWidth == 1
     result = Wire(kind: wireLiteral, value: e.literalValue)
   of rexprUndefined:
-    assert false
+    assert e.undefinedWidth == 1
+    result = Wire(kind: wireLiteral, value: 0)
   of rexprNot:
     if e.notChild.kind == rexprBinaryOp and e.notChild.op in {binaryOpAnd, binaryOpOr}:
       if e.notChild.op == binaryOpAnd:
