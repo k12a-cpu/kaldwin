@@ -194,7 +194,7 @@ proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
     walk(s.ifThenChildren, unit)
     walk(s.ifElseChildren, unit)
     newStmts.add(s)
-  
+
   of stmtSwitch:
     let bitExprs = flatten(s.switchExpr, unit)
     flattenSwitch(newStmts, s, bitExprs, bitExprs.high, s.switchCases.low, s.switchCases.high, unit)

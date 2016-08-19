@@ -9,18 +9,18 @@ type
   Node = object
     name: string
     bit: int
-  
+
   WireKind = enum
     wireNode
     wireLiteral
-  
+
   Wire = object
     case kind: WireKind
     of wireNode:
       pos, neg: Node
     of wireLiteral:
       value: range[0..1]
-  
+
   GateKind = enum
     gateNot
     gateAnd
@@ -28,14 +28,14 @@ type
     gateXor
     gateNand
     gateNor
-  
+
   Gate = object
     case kind: GateKind
     of gateNot:
       input: Wire
     of gateAnd, gateOr, gateXor, gateNand, gateNor:
       input1, input2: Wire
-  
+
   Mapper = object
     availableGates: set[GateKind]
     gates: seq[tuple[gate: Gate, output: Node]]
@@ -43,7 +43,7 @@ type
     assignments: seq[tuple[dest, source: Node]]
     constAssignments: seq[tuple[dest: Node, value: range[0..1]]]
     nextGeneratedNode: int
-  
+
   ImplementationError = object of Exception
 
 const allGates: set[GateKind] = {gateNot, gateAnd, gateOr, gateXor, gateNand, gateNor}
@@ -292,7 +292,7 @@ proc reorderTransients(m: var Mapper, nodeInfos: Table[string, NodeInfo]) =
       nodeInfos[node.name].transient
     except KeyError:
       true # generated nodes are transient
-  
+
   ## Move assignments to transient nodes to the end of the list, so that
   ## non-transient nodes will take precedence in the dealias stage.
   m.assignments.sort do (x, y: tuple[dest, source: Node]) -> int:
@@ -317,18 +317,18 @@ proc dealias(m: var Mapper) =
         indicesToDelete.add(i)
   for i in indicesToDelete.revItems:
     m.assignments.del(i)
-  
+
   template replace(node: var Node) =
     try:
       node = replacements[node]
     except KeyError:
       discard
-  
+
   template replace(wire: var Wire) =
     if wire.kind == wireNode:
       assert(not wire.pos.isNil)
       replace(wire.pos)
-  
+
   for t in m.gates.mitems:
     replace(t.output)
     case t.gate.kind
@@ -345,21 +345,21 @@ proc dealias(m: var Mapper) =
 
 proc prune(m: var Mapper, nodeInfos: Table[string, NodeInfo]) =
   var requiredNodes = initSet[Node]()
-  
+
   proc isNotTransient(node: Node): bool =
     try:
       not nodeInfos[node.name].transient
     except KeyError:
       false # generated nodes are transient
-  
+
   proc require(node: Node) =
     requiredNodes.incl(node)
-  
+
   proc require(wire: Wire) =
     if wire.kind == wireNode:
       assert(not wire.pos.isNil)
       require(wire.pos)
-  
+
   proc require(gate: Gate) =
     case gate.kind
     of gateNot:
@@ -367,7 +367,7 @@ proc prune(m: var Mapper, nodeInfos: Table[string, NodeInfo]) =
     of gateAnd, gateOr, gateXor, gateNand, gateNor:
       require(gate.input1)
       require(gate.input2)
-  
+
   for t in m.gates:
     if t.output.isNotTransient:
       requiredNodes.incl(t.output)
@@ -377,10 +377,10 @@ proc prune(m: var Mapper, nodeInfos: Table[string, NodeInfo]) =
   for t in m.constAssignments:
     if t.dest.isNotTransient:
       requiredNodes.incl(t.dest)
-  
+
   var x = 0
   var y = requiredNodes.card
-  
+
   while x != y:
     for t in m.gates:
       if t.output in requiredNodes:
@@ -388,10 +388,10 @@ proc prune(m: var Mapper, nodeInfos: Table[string, NodeInfo]) =
     for t in m.assignments:
       if t.dest in requiredNodes:
         require(t.source)
-    
+
     x = y
     y = requiredNodes.card
-  
+
   m.gates = filterIt(m.gates, it.output in requiredNodes)
   m.assignments = filterIt(m.assignments, it.dest in requiredNodes)
   m.constAssignments = filterIt(m.constAssignments, it.dest in requiredNodes)
@@ -403,7 +403,7 @@ proc map*(unit: CompilationUnitRef) =
   m.reorderTransients(unit.nodes)
   m.dealias()
   m.prune(unit.nodes)
-  
+
   proc `$`(node: Node): string =
     node.name & "[" & $node.bit & "]"
   proc `$`(wire: Wire): string =

@@ -24,7 +24,7 @@ switch spi_state {
             spi_next_state = 1'h1;
         }
     }
-    
+
     case 1'h1 {
         spi_next_state = 1'h1;
         if (spi_sck) {

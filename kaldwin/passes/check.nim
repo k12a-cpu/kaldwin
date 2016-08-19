@@ -113,7 +113,7 @@ proc walk(c: var Checker, s: StmtRef) =
     let sourceWidth = c.walk(s.source)
     if destWidth != sourceWidth:
       c.error(s.dest.loc, "source and destination have different bit widths ($1 and $2 respectively)" % [$sourceWidth, $destWidth])
-  
+
   of stmtIf:
     let condWidth = c.walk(s.ifCondition)
     if condWidth != 1:
@@ -122,7 +122,7 @@ proc walk(c: var Checker, s: StmtRef) =
       c.walk(child)
     for child in s.ifElseChildren:
       c.walk(child)
-  
+
   of stmtSwitch:
     let width = c.walk(s.switchExpr)
     let expectedNumCases = 1 shl width

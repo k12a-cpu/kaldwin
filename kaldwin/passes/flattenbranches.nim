@@ -6,7 +6,7 @@ type
   ContextKey = tuple
     node: string
     bit: int
-  
+
   Context = OrderedTable[ContextKey, RExprRef]
 
 include dereference
@@ -62,7 +62,7 @@ proc walk(s: StmtRef, unit: CompilationUnitRef, context: var Context) =
           muxThen: thenExpr,
           muxElse: elseExpr,
         )
-  
+
   of stmtSwitch:
     assert false
 
