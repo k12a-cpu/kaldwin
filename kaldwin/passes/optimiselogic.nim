@@ -79,6 +79,7 @@ proc walk(e: var RExprRef) =
         e = e.leftChild
       elif e.leftChild.kind == rexprNot and e.rightChild.kind == rexprNot:
         e = makeNot(makeOr(e.leftChild.notChild, e.rightChild.notChild))
+        walk(e)
     of binaryOpOr:
       if e.leftChild.isOne() or e.rightChild.isOne():
         e = one
@@ -88,6 +89,7 @@ proc walk(e: var RExprRef) =
         e = e.leftChild
       elif e.leftChild.kind == rexprNot and e.rightChild.kind == rexprNot:
         e = makeNot(makeAnd(e.leftChild.notChild, e.rightChild.notChild))
+        walk(e)
     of binaryOpXor:
       if e.leftChild.isZero():
         e = e.rightChild
@@ -109,25 +111,39 @@ proc walk(e: var RExprRef) =
     walk(e.muxCondition)
     walk(e.muxThen)
     walk(e.muxElse)
+    let thenIsZero = e.muxThen.isZero()
+    let thenIsOne = e.muxThen.isOne()
+    let elseIsZero = e.muxElse.isZero()
+    let elseIsOne = e.muxElse.isOne()
     if e.muxCondition.isZero() or e.muxThen.isUndefined():
       e = e.muxElse
     elif e.muxCondition.isOne() or e.muxElse.isUndefined():
       e = e.muxThen
-    elif e.muxThen.isOne() and e.muxElse.isZero():
+    elif thenIsZero and elseIsZero:
+      e = zero
+    elif thenIsOne and elseIsOne:
+      e = one
+    elif thenIsOne and elseIsZero:
       e = e.muxCondition
-    elif e.muxThen.isZero() and e.muxElse.isOne():
+    elif thenIsZero and elseIsOne:
       e = makeNot(e.muxCondition)
-    elif e.muxThen.isZero():
+    elif thenIsZero:
       e = makeAnd(makeNot(e.muxCondition), e.muxElse)
-    elif e.muxThen.isOne():
+      walk(e)
+    elif thenIsOne:
       e = makeOr(e.muxCondition, e.muxElse)
-    elif e.muxElse.isZero():
+      walk(e)
+    elif elseIsZero:
       e = makeAnd(e.muxCondition, e.muxThen)
-    elif e.muxElse.isOne():
+      walk(e)
+    elif elseIsOne:
       e = makeOr(makeNot(e.muxCondition), e.muxElse)
+      walk(e)
     elif e.muxCondition.kind == rexprNot:
       e.muxCondition = e.muxCondition.notChild
       swap(e.muxThen, e.muxElse)
+    elif e.muxThen == e.muxElse:
+      e = e.muxThen
 
   of rexprConcat:
     for child in e.concatChildren.mitems():
