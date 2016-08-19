@@ -62,6 +62,9 @@ proc walk(s: StmtRef, unit: CompilationUnitRef, context: var Context) =
           muxThen: thenExpr,
           muxElse: elseExpr,
         )
+  
+  of stmtSwitch:
+    assert false
 
 proc flattenBranches*(unit: CompilationUnitRef) =
   var context = initOrderedTable[ContextKey, RExprRef]()

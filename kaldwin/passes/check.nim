@@ -113,6 +113,7 @@ proc walk(c: var Checker, s: StmtRef) =
     let sourceWidth = c.walk(s.source)
     if destWidth != sourceWidth:
       c.error(s.dest.loc, "source and destination have different bit widths ($1 and $2 respectively)" % [$sourceWidth, $destWidth])
+  
   of stmtIf:
     let condWidth = c.walk(s.ifCondition)
     if condWidth != 1:
@@ -121,6 +122,33 @@ proc walk(c: var Checker, s: StmtRef) =
       c.walk(child)
     for child in s.ifElseChildren:
       c.walk(child)
+  
+  of stmtSwitch:
+    let width = c.walk(s.switchExpr)
+    let expectedNumCases = 1 shl width
+    if s.switchRawCases.len != expectedNumCases:
+      c.error(s.switchExpr.loc, "expected $1 cases for a switch expression of bit width $2, but got $3" % [$expectedNumCases, $width, $s.switchRawCases.len])
+    else:
+      s.switchWidth = width
+      s.switchCases.newSeq(expectedNumCases)
+      for rawCase in s.switchRawCases:
+        if rawCase.matchWidth != width:
+          c.error(rawCase.loc, "switch expression and case expression have different bit widths ($1 and $2 respectively)" % [$width, $rawCase.matchWidth])
+        elif rawCase.matchValue < 0 or rawCase.matchValue >= expectedNumCases:
+          c.error(rawCase.loc, "case expression out of range (must be in range 0..$1 inclusive)" % [$(expectedNumCases-1)])
+        elif s.switchCases[rawCase.matchValue].isNil:
+          let children = rawCase.children
+          for child in children:
+            c.walk(child)
+          s.switchCases[rawCase.matchValue] = children
+        else:
+          c.error(rawCase.loc, "duplicate case block matching value $1" % [$rawCase.matchValue])
+      when not defined(release):
+        if c.messages.len == 0:
+          # sanity check
+          for matchValue, children in s.switchCases:
+            assert(not children.isNil)
+      s.switchRawCases = nil
 
 proc walk(c: var Checker) =
   for s in c.unit.stmts:

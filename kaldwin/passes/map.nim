@@ -279,7 +279,7 @@ proc map(m: var Mapper, s: StmtRef) =
       m.assignments.add((dest: destNode, source: sourceWire.pos))
     of wireLiteral:
       m.constAssignments.add((dest: destNode, value: sourceWire.value))
-  of stmtIf:
+  of stmtIf, stmtSwitch:
     assert false
 
 proc map(m: var Mapper, unit: CompilationUnitRef) =

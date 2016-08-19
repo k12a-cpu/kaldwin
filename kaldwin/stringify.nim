@@ -126,6 +126,39 @@ proc rope*(s: StmtRef, indent: Rope = nil): Rope =
       result = &[result, indent, rope("}\n")]
     else:
       result = &[result, rope("\n")]
+  of stmtSwitch:
+    result = &[indent, rope("switch "), rope(s.switchExpr), rope(" {\n")]
+    let newIndent = indent & rope("    ")
+    if s.switchCases.isNil:
+      for rawCase in s.switchRawCases:
+        result = &[
+          result,
+          indent,
+          rope("  case "),
+          rope(rawCase.matchWidth),
+          rope("'d"),
+          rope(rawCase.matchValue),
+          rope(" {\n")
+        ]
+        for child in rawCase.children:
+          result = result & rope(child, newIndent)
+        result = &[result, indent, rope("  }\n")]
+    else:
+      let width = rope(s.switchWidth)
+      for matchValue, children in s.switchCases:
+        result = &[
+          result,
+          indent,
+          rope("  case "),
+          width,
+          rope("'d"),
+          rope(matchValue),
+          rope(" {\n")
+        ]
+        for child in children:
+          result = result & rope(child, newIndent)
+        result = &[result, indent, rope("  }\n")]
+    result = &[result, indent, rope("}\n")]
 
 proc rope*(unit: CompilationUnitRef): Rope =
   for node in unit.nodes.values:

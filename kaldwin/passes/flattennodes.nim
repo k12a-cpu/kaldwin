@@ -1,4 +1,5 @@
 import tables, ../types
+from algorithm import reverse
 from sequtils import cycle
 
 proc flatten(e: LExprRef, unit: CompilationUnitRef): seq[LExprRef] =
@@ -149,7 +150,28 @@ proc flatten(e: RExprRef, unit: CompilationUnitRef): seq[RExprRef] =
     let bitExprs = flatten(e.sliceChild, unit)
     result = bitExprs[e.sliceLowerBound .. e.sliceUpperBound]
 
+proc walk(stmts: seq[StmtRef], newStmts: var seq[StmtRef], unit: CompilationUnitRef)
 proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef)
+
+proc flattenSwitch(dest: var seq[StmtRef], s: StmtRef, bitExprs: seq[RExprRef], bitExprIdx, casesLow, casesHigh: int, unit: CompilationUnitRef) =
+  if casesLow == casesHigh:
+    assert bitExprIdx < 0
+    walk(s.switchCases[casesLow], dest, unit)
+  else:
+    var thenChildren = newSeq[StmtRef]()
+    var elseChildren = newSeq[StmtRef]()
+    let casesMidLow = (casesLow + casesHigh) div 2
+    let casesMidHigh = casesMidLow + 1
+    assert((casesHigh - casesMidHigh) == (casesMidLow - casesLow))
+    flattenSwitch(thenChildren, s, bitExprs, bitExprIdx - 1, casesMidHigh, casesHigh, unit)
+    flattenSwitch(elseChildren, s, bitExprs, bitExprIdx - 1, casesLow, casesMidLow, unit)
+    dest.add(StmtRef(
+      loc: s.loc,
+      kind: stmtIf,
+      ifCondition: bitExprs[bitExprIdx],
+      ifThenChildren: thenChildren,
+      ifElseChildren: elseChildren,
+    ))
 
 proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
   case s.kind
@@ -172,11 +194,18 @@ proc walk(s: StmtRef, newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
     walk(s.ifThenChildren, unit)
     walk(s.ifElseChildren, unit)
     newStmts.add(s)
+  
+  of stmtSwitch:
+    let bitExprs = flatten(s.switchExpr, unit)
+    flattenSwitch(newStmts, s, bitExprs, bitExprs.high, s.switchCases.low, s.switchCases.high, unit)
+
+proc walk(stmts: seq[StmtRef], newStmts: var seq[StmtRef], unit: CompilationUnitRef) =
+  for s in stmts:
+    walk(s, newStmts, unit)
 
 proc walk(stmts: var seq[StmtRef], unit: CompilationUnitRef) =
   var newStmts: seq[StmtRef] = @[]
-  for s in stmts:
-    walk(s, newStmts, unit)
+  walk(stmts, newStmts, unit)
   stmts = newStmts
 
 proc flattenNodes*(unit: CompilationUnitRef) =

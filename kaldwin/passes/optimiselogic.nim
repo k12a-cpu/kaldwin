@@ -143,8 +143,8 @@ proc walk(s: StmtRef) =
   case s.kind
   of stmtAssign:
     walk(s.source)
-  of stmtIf:
-    assert(false, "stmtIf should not be present at this stage")
+  of stmtIf, stmtSwitch:
+    assert false
 
 proc walk(unit: CompilationUnitRef) =
   for s in unit.stmts:

@@ -78,6 +78,13 @@ type
   StmtKind* = enum
     stmtAssign
     stmtIf
+    stmtSwitch
+
+  RawSwitchCase* = object
+    loc*: Loc
+    matchWidth*: int
+    matchValue*: int
+    children*: seq[ref Stmt]
 
   Stmt* = object
     loc*: Loc
@@ -89,6 +96,11 @@ type
       ifCondition*: ref RExpr
       ifThenChildren*: seq[ref Stmt]
       ifElseChildren*: seq[ref Stmt]
+    of stmtSwitch:
+      switchExpr*: ref RExpr
+      switchRawCases*: seq[RawSwitchCase]
+      switchWidth*: int                 # populated by check pass
+      switchCases*: seq[seq[ref Stmt]]  # populated by check pass
 
   StmtRef* = ref Stmt
 
@@ -148,13 +160,13 @@ proc hash*(e: RExprRef): Hash {.noSideEffect.} =
 
   result = !$result
 
-proc hash*(s: StmtRef): Hash {.noSideEffect.} =
-  result = result !& hash(s.kind)
+# proc hash*(s: StmtRef): Hash {.noSideEffect.} =
+#   result = result !& hash(s.kind)
 
-  case s.kind
-  of stmtAssign:
-    result = result !& hash(s.source) !& hash(s.dest)
-  of stmtIf:
-    result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) !& hash(s.ifElseChildren)
+#   case s.kind
+#   of stmtAssign:
+#     result = result !& hash(s.source) !& hash(s.dest)
+#   of stmtIf:
+#     result = result !& hash(s.ifCondition) !& hash(s.ifThenChildren) !& hash(s.ifElseChildren)
 
-  result = !$result
+#   result = !$result

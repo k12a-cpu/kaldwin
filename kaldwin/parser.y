@@ -19,10 +19,12 @@
     } sized_int;
 }
 
+%token CASE
 %token ELSE
 %token EXTERN
 %token IF
 %token NODE
+%token SWITCH
 %token TRANSIENT
 %token EQ
 %token NE
@@ -30,7 +32,7 @@
 %token <str> IDENT
 %token <sized_int> SIZED_INT
 
-%type <u64> extern transient statements_opt statements else_content lexprs_comma lexprs rexprs_comma rexprs
+%type <u64> extern transient statements_opt statements else_content cases_opt cases lexprs_comma lexprs rexprs_comma rexprs
 
 %%
 
@@ -76,6 +78,7 @@ statements
 statement
     : assignment
     | if
+    | switch
     ;
 
 assignment
@@ -91,6 +94,24 @@ if
 else_content
     : '{' statements_opt '}'                    { $$ = $2; }
     | if                                        { $$ = 1; }
+    ;
+
+switch
+    : SWITCH rexpr '{' cases_opt '}'            { kaldwin_yy_construct_stmt_switch($4); }
+    ;
+
+cases_opt
+    : cases                                     { $$ = $1; }
+    |                                           { $$ = 0; }
+    ;
+
+cases
+    : cases case                                { $$ = $1 + 1; }
+    | case                                      { $$ = 1; }
+    ;
+
+case
+    : CASE SIZED_INT '{' statements_opt '}'     { kaldwin_yy_construct_case($2.width, $2.value, $4); }
     ;
 
 lexprs_comma

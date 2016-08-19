@@ -18,10 +18,12 @@
 
 [\(\)\[\]\{\}=:;,~&\|\^x]  { return kaldwin_yytext[0]; }
 
+case                    { return CASE; }
 else                    { return ELSE; }
 extern                  { return EXTERN; }
 if                      { return IF; }
 node                    { return NODE; }
+switch                  { return SWITCH; }
 transient               { return TRANSIENT; }
 "=="                    { return EQ; }
 "!="                    { return NE; }

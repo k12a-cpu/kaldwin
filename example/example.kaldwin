@@ -12,25 +12,29 @@ extern node spi_next_state;
 spi_counter_tick = 1'h0;
 spi_data_store = 1'h0;
 
-if (~spi_state) {
-    spi_next_state = 1'h0;
-    if (spi_data_io_store) {
-        spi_data_sel = 1'h0;
-        spi_data_store = 1'h1;
-    }
-    if (spi_begin) {
-        spi_counter_tick = 1'h1;
-        spi_next_state = 1'h1;
-    }
-} else {
-    spi_next_state = 1'h1;
-    if (spi_sck) {
-        spi_data_sel = 1'h1;
-        spi_data_store = 1'h1;
-    }
-    if (spi_counter_zero) {
+switch spi_state {
+    case 1'h0 {
         spi_next_state = 1'h0;
-    } else {
-        spi_counter_tick = 1'h1;
+        if (spi_data_io_store) {
+            spi_data_sel = 1'h0;
+            spi_data_store = 1'h1;
+        }
+        if (spi_begin) {
+            spi_counter_tick = 1'h1;
+            spi_next_state = 1'h1;
+        }
+    }
+    
+    case 1'h1 {
+        spi_next_state = 1'h1;
+        if (spi_sck) {
+            spi_data_sel = 1'h1;
+            spi_data_store = 1'h1;
+        }
+        if (spi_counter_zero) {
+            spi_next_state = 1'h0;
+        } else {
+            spi_counter_tick = 1'h1;
+        }
     }
 }

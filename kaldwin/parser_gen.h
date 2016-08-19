@@ -53,16 +53,18 @@ extern int kaldwin_yydebug;
 # define KALDWIN_YYTOKENTYPE
   enum kaldwin_yytokentype
   {
-    ELSE = 258,
-    EXTERN = 259,
-    IF = 260,
-    NODE = 261,
-    TRANSIENT = 262,
-    EQ = 263,
-    NE = 264,
-    INT = 265,
-    IDENT = 266,
-    SIZED_INT = 267
+    CASE = 258,
+    ELSE = 259,
+    EXTERN = 260,
+    IF = 261,
+    NODE = 262,
+    SWITCH = 263,
+    TRANSIENT = 264,
+    EQ = 265,
+    NE = 266,
+    INT = 267,
+    IDENT = 268,
+    SIZED_INT = 269
   };
 #endif
 
@@ -80,7 +82,7 @@ union KALDWIN_YYSTYPE
         uint64_t value;
     } sized_int;
 
-#line 84 "kaldwin/parser_gen.h" /* yacc.c:1909  */
+#line 86 "kaldwin/parser_gen.h" /* yacc.c:1909  */
 };
 
 typedef union KALDWIN_YYSTYPE KALDWIN_YYSTYPE;

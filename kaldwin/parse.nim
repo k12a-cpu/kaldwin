@@ -16,6 +16,7 @@ var unit: CompilationUnitRef
 var stmtStack: seq[StmtRef] = @[]
 var lexprStack: seq[LExprRef] = @[]
 var rexprStack: seq[RExprRef] = @[]
+var caseStack: seq[RawSwitchCase] = @[]
 
 proc reset() =
   unit.new()
@@ -23,6 +24,7 @@ proc reset() =
   stmtStack.setLen(0)
   lexprStack.setLen(0)
   rexprStack.setLen(0)
+  caseStack.setLen(0)
 
 proc popn[T](a: var seq[T], count: int): seq[T] {.noSideEffect.} =
   let length = a.len()
@@ -65,6 +67,25 @@ proc constructStmtIf(numThenChildren, numElseChildren: uint64) {.cdecl, exportc:
     ifCondition: condition,
     ifThenChildren: thenChildren,
     ifElseChildren: elseChildren,
+  ))
+
+proc constructStmtSwitch(numCases: uint64) {.cdecl, exportc: "kaldwin_yy_construct_stmt_switch".} =
+  let cases = caseStack.popn(int(numCases))
+  let switchExpr = rexprStack.pop()
+  stmtStack.add(StmtRef(
+    loc: currentLoc(),
+    kind: stmtSwitch,
+    switchExpr: switchExpr,
+    switchRawCases: cases,
+  ))
+
+proc constructCase(matchWidth, matchValue, numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_case".} =
+  let children = stmtStack.popn(int(numChildren))
+  caseStack.add(RawSwitchCase(
+    loc: currentLoc(),
+    matchWidth: int(matchWidth),
+    matchValue: int(matchValue),
+    children: children,
   ))
 
 proc addNode(name: cstring, bits, extern, transient: uint64) {.cdecl, exportc: "kaldwin_yy_add_node".} =
