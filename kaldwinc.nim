@@ -5,6 +5,7 @@ import kaldwin.passes.check
 import kaldwin.passes.flattennodes
 import kaldwin.passes.flattenbranches
 import kaldwin.passes.optimiselogic
+import kaldwin.passes.map
 # import kaldwin.generators.attano
 
 const doc = """
@@ -65,6 +66,8 @@ optimiseLogic(unit)
 if dump == "opt1":
   echo $unit
   quit(0)
+
+map(unit)
 
 # nandify(unit)
 # if dump == "nand":
