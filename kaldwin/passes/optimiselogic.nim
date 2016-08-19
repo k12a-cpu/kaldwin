@@ -97,15 +97,13 @@ proc walk(e: var RExprRef) =
         e = makeNot(e.rightChild)
       elif e.rightChild.isOne():
         e = makeNot(e.leftChild)
-    of binaryOpEq, binaryOpNe:
-      if e.leftChild.isZero():
-        e = makeNot(e.rightChild)
-      elif e.leftChild.isOne():
-        e = e.rightChild
-      elif e.rightChild.isZero():
-        e = makeNot(e.leftChild)
-      elif e.rightChild.isOne():
-        e = e.leftChild
+    of binaryOpEq:
+      e.op = binaryOpXor
+      e = makeNot(e)
+      walk(e)
+    of binaryOpNe:
+      e.op = binaryOpXor
+      walk(e)
 
   of rexprMux:
     walk(e.muxCondition)
