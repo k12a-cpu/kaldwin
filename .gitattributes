@@ -1,3 +1,3 @@
 # Exclude auto-generated C files from Github's language statistics
 kaldwin/*_gen.c linguist-vendored
-kaldiwn/*_gen.h linguist-vendored
+kaldwin/*_gen.h linguist-vendored
