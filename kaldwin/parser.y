@@ -30,9 +30,9 @@
 %token NE
 %token <u64> INT
 %token <str> IDENT
-%token <sized_int> SIZED_INT
+%token <sized_int> SIZED_INT SIZED_UNDEF
 
-%type <u64> extern transient statements_opt statements else_content cases_opt cases lexprs_comma lexprs rexprs_comma rexprs
+%type <u64> extern transient statements_opt statements else_content cases_opt cases case sized_ints lexprs_comma lexprs rexprs_comma rexprs
 
 %%
 
@@ -106,12 +106,17 @@ cases_opt
     ;
 
 cases
-    : cases case                                { $$ = $1 + 1; }
-    | case                                      { $$ = 1; }
+    : cases case                                { $$ = $1 + $2; }
+    | case                                      { $$ = $1; }
     ;
 
 case
-    : CASE SIZED_INT '{' statements_opt '}'     { kaldwin_yy_construct_case($2.width, $2.value, $4); }
+    : CASE sized_ints '{' statements_opt '}'    { kaldwin_yy_construct_case($2, $4); $$ = $2; }
+    ;
+
+sized_ints
+    : sized_ints ',' SIZED_INT                  { kaldwin_yy_construct_case_value($3.width, $3.value); $$ = $1 + 1; }
+    | SIZED_INT                                 { kaldwin_yy_construct_case_value($1.width, $1.value); $$ = 1; }
     ;
 
 lexprs_comma
@@ -173,6 +178,7 @@ rexpr_noprefix
 rexpr_nosuffix
     : IDENT                                     { kaldwin_yy_construct_rexpr_noderef($1); }
     | SIZED_INT                                 { kaldwin_yy_construct_rexpr_literal($1.width, $1.value); }
+    | SIZED_UNDEF                               { kaldwin_yy_construct_rexpr_undefined($1.width); }
     | '{' rexprs_comma '}'                      { kaldwin_yy_construct_rexpr_concat($2); }
     | '{' INT 'x' rexpr_atom '}'                { kaldwin_yy_construct_rexpr_multiply($2); }
     | '(' rexpr ')'

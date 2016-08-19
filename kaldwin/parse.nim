@@ -17,6 +17,7 @@ var stmtStack: seq[StmtRef] = @[]
 var lexprStack: seq[LExprRef] = @[]
 var rexprStack: seq[RExprRef] = @[]
 var caseStack: seq[RawSwitchCase] = @[]
+var caseValueStack: seq[tuple[width, value: int]] = @[]
 
 proc reset() =
   unit.new()
@@ -25,6 +26,7 @@ proc reset() =
   lexprStack.setLen(0)
   rexprStack.setLen(0)
   caseStack.setLen(0)
+  caseValueStack.setLen(0)
 
 proc popn[T](a: var seq[T], count: int): seq[T] {.noSideEffect.} =
   let length = a.len()
@@ -79,14 +81,19 @@ proc constructStmtSwitch(numCases: uint64) {.cdecl, exportc: "kaldwin_yy_constru
     switchRawCases: cases,
   ))
 
-proc constructCase(matchWidth, matchValue, numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_case".} =
+proc constructCase(numValues, numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_case".} =
   let children = stmtStack.popn(int(numChildren))
-  caseStack.add(RawSwitchCase(
-    loc: currentLoc(),
-    matchWidth: int(matchWidth),
-    matchValue: int(matchValue),
-    children: children,
-  ))
+  let caseValues = caseValueStack.popn(int(numValues))
+  for caseValue in caseValues:
+    caseStack.add(RawSwitchCase(
+      loc: currentLoc(),
+      matchWidth: caseValue.width,
+      matchValue: caseValue.value,
+      children: children,
+    ))
+
+proc constructCaseValue(width, value: uint64) {.cdecl, exportc: "kaldwin_yy_construct_case_value".} =
+  caseValueStack.add((width: int(width), value: int(value)))
 
 proc addNode(name: cstring, bits, extern, transient: uint64) {.cdecl, exportc: "kaldwin_yy_add_node".} =
   let node = NodeInfo(
@@ -173,6 +180,13 @@ proc constructRExprLiteral(width: uint64, value: uint64) {.cdecl, exportc: "kald
     kind: rexprLiteral,
     literalWidth: int(width),
     literalValue: int(value),
+  ))
+
+proc constructRExprUndefined(width: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_undefined".} =
+  rexprStack.add(RExprRef(
+    loc: currentLoc(),
+    kind: rexprUndefined,
+    undefinedWidth: int(width),
   ))
 
 proc constructRExprConcat(numChildren: uint64) {.cdecl, exportc: "kaldwin_yy_construct_rexpr_concat".} =

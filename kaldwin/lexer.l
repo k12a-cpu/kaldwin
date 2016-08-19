@@ -43,6 +43,9 @@ transient               { return TRANSIENT; }
                           kaldwin_yylval.sized_int.value = (uint64_t) strtol(endptr + 2, NULL, 16);
                           return SIZED_INT; }
 
+[0-9]+\'u               { kaldwin_yylval.sized_int.width = (uint64_t) strtol(kaldwin_yytext, NULL, 10);
+                          return SIZED_UNDEF; }
+
 [0-9]+                  { kaldwin_yylval.u64 = (uint64_t) strtol(kaldwin_yytext, NULL, 10);
                           return INT; }
 

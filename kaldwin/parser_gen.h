@@ -64,7 +64,8 @@ extern int kaldwin_yydebug;
     NE = 266,
     INT = 267,
     IDENT = 268,
-    SIZED_INT = 269
+    SIZED_INT = 269,
+    SIZED_UNDEF = 270
   };
 #endif
 
@@ -82,7 +83,7 @@ union KALDWIN_YYSTYPE
         uint64_t value;
     } sized_int;
 
-#line 86 "kaldwin/parser_gen.h" /* yacc.c:1909  */
+#line 87 "kaldwin/parser_gen.h" /* yacc.c:1909  */
 };
 
 typedef union KALDWIN_YYSTYPE KALDWIN_YYSTYPE;
